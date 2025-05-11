@@ -1,6 +1,6 @@
 {
   "0": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What explains Elon Musk's past inaccuracies in predicting the timeline for full self-driving capabilities in Tesla vehicles, and what is his current outlook?",
     "answer": "Musk attributes past inaccuracies to the unforeseen complexity of the problem.  He initially underestimated the need to essentially solve real-world AI and sophisticated vision to replicate the capabilities of human brains and eyes in navigating road networks. However, he expresses confidence that Tesla will achieve a safety record exceeding that of the average human driver this year.",
     "metadata": {
@@ -11,7 +11,7 @@
     }
   },
   "1": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk justify his historically aggressive prediction timelines for technological advancements, particularly in the context of full self-driving?",
     "answer": "Musk argues that setting ambitious, even seemingly aggressive, timelines is a necessary motivator to drive progress and ensure that projects are completed.  Without such pressure, he believes insufficient effort would be exerted.",
     "metadata": {
@@ -22,7 +22,7 @@
     }
   },
   "2": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "Why was Musk's prediction of Tesla vehicle sales in 2020 accurate while his full self-driving timeline predictions were not?",
     "answer": "Musk implicitly contrasts the predictability of vehicle sales (a more established market with clearer growth trajectories) with the unpredictable challenges of solving the complex problem of full self-driving which required breakthroughs in AI and vision processing beyond initial estimations. The sales prediction involved more readily available data and a less inherently complex technological challenge.",
     "metadata": {
@@ -33,7 +33,7 @@
     }
   },
   "3": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How did Tesla's work on Full Self-Driving technology lead to the development of Optimus, and what are the key remaining challenges?",
     "answer": "The development of Full Self-Driving required solving real-world AI for a car (a robot on four wheels).  This technology is being generalized to a robot on legs (Optimus). The main remaining challenges are developing sufficient real-world intelligence and scaling up manufacturing—areas where Tesla excels.  Specialized actuators and sensors also need to be designed.",
     "metadata": {
@@ -66,7 +66,7 @@
     }
   },
   "6": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What motivated Elon Musk's unexpected offer to buy Twitter, despite his previous reservations?",
     "answer": "Musk believes Twitter is a crucial platform for free speech and that it needs improvements to increase trust and transparency, such as open-sourcing its algorithm. He acknowledges the potential for personal blame and hardship but feels the risk to free speech and democracy warrants the effort.",
     "metadata": {
@@ -77,7 +77,7 @@
     }
   },
   "7": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk plan to address concerns about free speech and transparency on Twitter?",
     "answer": "Musk proposes open-sourcing Twitter's algorithm and making any changes to tweets (emphasis or de-emphasis) transparent to users. This aims to eliminate hidden manipulation and increase user trust in the platform's integrity.",
     "metadata": {
@@ -88,7 +88,7 @@
     }
   },
   "8": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk view the potential risks and challenges associated with his Twitter acquisition?",
     "answer": "Musk acknowledges that acquiring Twitter will likely be \"miserable,\" with all blame falling on him, and that he is unsure if he will even succeed. Despite these acknowledged risks, he believes that the potential benefits to free speech and democracy outweigh them.",
     "metadata": {
@@ -99,7 +99,7 @@
     }
   },
   "9": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are Elon Musk's primary motivations behind his acquisition of Twitter, and how does he define the limits of free speech on the platform?",
     "answer": "Musk's acquisition is driven by a belief in the importance of a maximally trusted and broadly inclusive public platform for the future of civilization, not financial gain.  He clarifies that free speech on Twitter is limited by the laws of the operating country, prohibiting actions like direct incitement to violence.  The line between acceptable and unacceptable speech is nuanced and requires human judgment, but he advocates for transparency by opening the algorithm to public scrutiny.",
     "metadata": {
@@ -110,7 +110,7 @@
     }
   },
   "10": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk propose to address the challenges of content moderation on Twitter, given the complexities and disagreements around what constitutes acceptable speech?",
     "answer": "Musk proposes a system where Twitter's content moderation aligns with the laws of its operating country.  He emphasizes transparency by making the algorithm open-source, allowing public review and critique.  While acknowledging the need for human judgment in ambiguous cases, he suggests erring on the side of caution if uncertain.",
     "metadata": {
@@ -121,7 +121,7 @@
     }
   },
   "11": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk respond to concerns about the scale and difficulty of content moderation, particularly concerning the need for human judgment in ambiguous cases and the vast number of employees required by other platforms?",
     "answer": "Musk acknowledges the difficulty and the immense number of people other platforms employ for content moderation. However, he emphasizes the importance of transparency and suggests erring on the side of caution when faced with ambiguous cases. He believes that making the algorithm open-source allows for public participation in identifying and addressing problematic aspects of the moderation process, thus implicitly reducing the required number of human moderators.",
     "metadata": {
@@ -132,7 +132,7 @@
     }
   },
   "12": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk plan to balance free speech with content moderation on Twitter, and address concerns about his ownership?",
     "answer": "Musk prioritizes minimizing content deletion and permanent bans, favoring timeouts instead. He emphasizes transparency through open-sourcing the algorithm and identifying manual adjustments to tweets. He acknowledges concerns about his ownership but points to similar situations with other major social media platforms, highlighting the difference in Twitter's ownership structure.",
     "metadata": {
@@ -143,7 +143,7 @@
     }
   },
   "13": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are Elon Musk's immediate priorities for improving the Twitter platform?",
     "answer": "Musk's top priority is eliminating spam and scam bots, which he sees as significantly degrading user experience.  He also mentions the introduction of an edit button as a high priority.",
     "metadata": {
@@ -154,7 +154,7 @@
     }
   },
   "14": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk address concerns about the potential for misuse of an edit button, particularly regarding retweets and altered meanings?",
     "answer": "The transcript does not provide a direct answer to this question. Musk only mentions the edit button is coming and does not discuss potential solutions to its misuse in the context of retweets.",
     "metadata": {
@@ -165,7 +165,7 @@
     }
   },
   "15": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk explain his approach to using Twitter, and why does he believe it has been successful despite occasional controversial tweets?",
     "answer": "Musk attributes his Twitter success to a stream-of-consciousness approach, tweeting whatever he finds interesting or funny in the moment, even if it's considered \"embarrassing\" or \"crazy\" by some. He believes authenticity and oversharing resonate with his audience.",
     "metadata": {
@@ -176,7 +176,7 @@
     }
   },
   "16": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk justify his past statement about securing funding to take Tesla private, and what were the consequences of his actions?",
     "answer": "Musk claims funding was indeed secured but that he was coerced by banks into settling with the SEC to avoid Tesla's immediate bankruptcy, resulting in a perceived admission of lying when he felt he hadn't.  He emphasizes the extreme pressure he was under at the time due to the precarious financial situation.",
     "metadata": {
@@ -187,7 +187,7 @@
     }
   },
   "17": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What was the impact of short-selling on Tesla, and how did Musk view the situation at the time?",
     "answer": "Musk describes a relentless and unprecedented short-seller attack on Tesla, which negatively affected hiring, sales, and the company's overall well-being. He viewed the situation as extremely harmful and a significant threat to the company's survival.",
     "metadata": {
@@ -198,7 +198,7 @@
     }
   },
   "18": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's perspective on balancing public image concerns with his proactive approach to conflict?",
     "answer": "Musk acknowledges his combative nature but prioritizes truth, even if it means engaging in conflict with powerful authorities. He implies a plan B if his current endeavors fail but is unwilling to disclose it.",
     "metadata": {
@@ -209,7 +209,7 @@
     }
   },
   "19": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What does Musk identify as his biggest business mistake, and what narrative is he attempting to correct?",
     "answer": "Musk's biggest mistake was not solely founding Tesla with J.B. Straubel. He is also actively disputing a narrative created by another co-founder, Martin Eberhard, that minimizes his and Straubel's roles in establishing the company.",
     "metadata": {
@@ -220,7 +220,7 @@
     }
   },
   "20": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What does Musk consider Tesla's most significant achievement, and how does this perspective shape his view of the challenges in the automotive industry?",
     "answer": "Tesla's greatest accomplishment is achieving high-volume production, a feat unseen in the American automotive industry for a century.  This highlights the difficulty of scaling a car company beyond prototype and low-volume production, a challenge many startups fail to overcome.",
     "metadata": {
@@ -231,7 +231,7 @@
     }
   },
   "21": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What were the major challenges Elon Musk faced during Model 3 production, and how did he overcome them?",
     "answer": "Musk describes the Model 3 production as having \"messed up almost every aspect\" of the production line. To overcome this, he lived in the factories for three years, personally addressing problems and working alongside his team.  He emphasizes this intense, hands-on approach as the only way to save the company from bankruptcy.",
     "metadata": {
@@ -242,7 +242,7 @@
     }
   },
   "22": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk's experience with Model 3 production inform his current approach to manufacturing and scaling Tesla's operations?",
     "answer": "Musk claims to now possess unparalleled knowledge of manufacturing, gained through his intense involvement in fixing the Model 3 production line. He believes this experience gives him a significant advantage and prevents a repeat of those issues. His current focus on scale is driven by the need to rapidly transition the global economy to sustainable energy.",
     "metadata": {
@@ -253,7 +253,7 @@
     }
   },
   "23": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's perspective on the importance of scale in accelerating the adoption of sustainable energy?",
     "answer": "Musk views scale as absolutely critical for transitioning to a sustainable energy economy.  He believes that achieving the necessary change requires massive production and deployment of sustainable energy technologies.",
     "metadata": {
@@ -264,7 +264,7 @@
     }
   },
   "24": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's vision for achieving a sustainable energy future, and what role does Tesla play in this vision?",
     "answer": "Musk's vision centers on rapidly scaling battery production (approximately 300 terawatt-hours needed) to electrify transportation, heating, and cooling. Tesla aims to contribute significantly to this massive scale-up, while also advocating for others to join the effort.  Recycling of batteries is crucial as it recovers valuable raw materials.  The urgency stems from the belief that faster action mitigates environmental risks.",
     "metadata": {
@@ -275,7 +275,7 @@
     }
   },
   "25": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk describe his experience with Asperger's Syndrome, and how has it shaped his perspective?",
     "answer": "Musk describes his childhood experience with Asperger's as involving difficulty understanding social cues, taking things literally, and facing bullying. He attributes his deep engagement with reading to compensating for these social challenges.  His perspective is that everyone's experience is unique, but his highlights challenges in social comprehension and the resulting need to learn those skills through his own experience.",
     "metadata": {
@@ -286,7 +286,7 @@
     }
   },
   "26": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk's approach to communication reflect his personality and his views on achieving large-scale goals?",
     "answer": "Musk's communication style, noted as sometimes lacking in intonation, is acknowledged and even presented humorously.  However, his direct, unambiguous style seems consistent with his focus on concrete actions and results in achieving goals like sustainable energy transition. His literal interpretation of language, previously described as a characteristic of his Asperger's, is potentially tied to his ability to focus on the core tasks.",
     "metadata": {
@@ -297,7 +297,7 @@
     }
   },
   "27": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How did Elon Musk's atypical childhood experiences potentially contribute to his unique approach to innovation and understanding of the world?",
     "answer": "Musk suggests his delayed understanding of social cues and his intense focus on solitary activities like programming may have allowed him to develop a deeper, more independent understanding of the world, unburdened by typical social distractions.  This fostered a focus on internal processing and problem-solving.",
     "metadata": {
@@ -308,7 +308,7 @@
     }
   },
   "28": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the core elements that drive Elon Musk's innovative process across various industries?",
     "answer": "Musk identifies three key components:  a broad vision of scientific and technological possibilities, a deep understanding of the underlying physics and costs involved, and a relentless pursuit of truth as a foundational driver of his inquiries into physics and information theory.",
     "metadata": {
@@ -319,7 +319,7 @@
     }
   },
   "29": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How did Musk's early exploration of philosophical questions about the meaning of life influence his approach to innovation and the pursuit of truth?",
     "answer": "Musk's early grappling with existential questions, including a period of depression stemming from these inquiries, fueled a deep curiosity about the universe and its fundamental truths. This profound curiosity, which he describes as an obsession with truth, became a central driver of his studies in physics and information theory, ultimately informing his innovative pursuits.",
     "metadata": {
@@ -330,7 +330,7 @@
     }
   },
   "30": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's guiding philosophy, and how does it inform his actions?",
     "answer": "Musk's driving philosophy is to expand the scope and scale of consciousness (biological and digital) to better understand the universe. This understanding, achieved by asking the right questions, motivates his actions and endeavors.",
     "metadata": {
@@ -341,7 +341,7 @@
     }
   },
   "31": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk view the future, and what is his role in shaping it?",
     "answer": "Musk envisions a significantly digital future, different from his own upbringing. He believes it's crucial to strive for a positive future for all children, focusing on creating reasons for optimism and excitement rather than solely addressing problems. He acknowledges the possibility of a negative future but is actively working towards a positive trajectory through various endeavors, including space exploration and AI development.  His personal commitment stems from a deep love for humanity and a belief in the importance of fighting for a good future.",
     "metadata": {
@@ -352,7 +352,7 @@
     }
   },
   "32": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk reconcile the seemingly whimsical reference to \"42\" from *The Hitchhiker's Guide to the Galaxy* with his serious approach to life's bigger questions?",
     "answer": "Musk views the importance of \"the question\" over \"the answer,\" as highlighted in *The Hitchhiker's Guide to the Galaxy*, as central to his philosophy.  The focus on asking the right questions about the universe is the driving force behind his endeavors to expand consciousness and understand our place in the cosmos.  The reference to \"42\" serves as a lighthearted analogy to the profound importance of the questions themselves.",
     "metadata": {
@@ -363,7 +363,7 @@
     }
   },
   "33": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's proposed solution to alleviate urban traffic congestion, and what are its key features?",
     "answer": "Musk proposes a 3D network of tunnels beneath cities, utilizing high-speed electric skates to transport vehicles at speeds up to 130 mph.  Key features include seamless city integration via elevator systems using minimal surface space and the ability to create multiple tunnel levels to handle increasing traffic.  The system is designed to be initially toll-based.",
     "metadata": {
@@ -374,7 +374,7 @@
     }
   },
   "34": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk plan to overcome the high cost typically associated with tunnel construction?",
     "answer": "Musk aims to reduce tunneling costs by a factor of ten through two main strategies: significantly reducing tunnel diameter (from 26-28 feet to 12 feet) and designing continuous tunneling machines that simultaneously reinforce tunnel walls, eliminating downtime.",
     "metadata": {
@@ -385,7 +385,7 @@
     }
   },
   "35": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is the fundamental argument against the single-level tunnel solution, and how does Musk's proposal address it?",
     "answer": "The criticism is that adding a single layer of tunnels will only temporarily alleviate congestion, leading to a return to the original problem. Musk counters this by emphasizing the scalability of his 3D network, allowing for an arbitrary number of tunnel levels to accommodate growing traffic demands.",
     "metadata": {
@@ -396,7 +396,7 @@
     }
   },
   "36": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's primary motivation for developing advanced tunneling technology, and how does it relate to his vision for future cities?",
     "answer": "Musk's motivation is to significantly reduce the cost and time of tunneling, aiming for speeds exceeding current tunnel boring machines by an order of magnitude. This technology is viewed as a superior alternative to flying cars for urban transportation, addressing concerns about noise, safety, and anxiety-inducing aerial traffic.  The vision is a network of underground tunnels for efficient transportation, potentially integrated with Hyperloop technology.",
     "metadata": {
@@ -407,7 +407,7 @@
     }
   },
   "37": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk view the potential of Hyperloop technology, and what is the current status of its development?",
     "answer": "Musk sees Hyperloop as a viable, potentially extremely fast (faster than the world's fastest bullet train), long-distance transportation system, which could utilize the advanced tunneling technology discussed.  While initially a \"hobby thing\" and a student competition project, the development is ongoing, with promising results in speed tests.  The size of the test vacuum chamber constructed for the project is also highlighted.",
     "metadata": {
@@ -418,7 +418,7 @@
     }
   },
   "38": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the key engineering challenges and considerations for building extensive underground Hyperloop tunnels, and how does Musk propose to address them?",
     "answer": "A major challenge is sealing tunnels against the water table, requiring strong tunnel walls capable of withstanding high pressure.  Musk points out that building a tunnel strong enough to resist the water table automatically makes it suitable for vacuum conditions required by Hyperloop.  He also addresses concerns about the impact of digging on residents above, suggesting that digging sufficiently deep mitigates this issue.  Length of the tunnels is also discussed, proposing that there are no real limitations to the length of the tunnels.",
     "metadata": {
@@ -429,7 +429,7 @@
     }
   },
   "39": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's current level of involvement with The Boring Company, and what is his perspective on its significance?",
     "answer": "Musk describes The Boring Company as a minor side project, comprising only 2-3% of his time and primarily involving interns and part-time employees using second-hand machinery.  He characterizes it as a \"hobby,\" though one on a substantial scale.",
     "metadata": {
@@ -440,7 +440,7 @@
     }
   },
   "40": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk anticipate autonomous vehicles impacting traffic congestion, and what is his solution?",
     "answer": "Musk argues that while autonomous vehicles might initially improve speed, shared autonomous vehicles will drastically increase the affordability and accessibility of car travel, leading to significantly more cars on the road and thus, worse traffic. His solution is The Boring Company's tunneling project to alleviate this increased congestion.",
     "metadata": {
@@ -451,7 +451,7 @@
     }
   },
   "41": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's current view on the state of electric vehicle adoption by other auto manufacturers, and his future plans for Tesla?",
     "answer": "Musk acknowledges that nearly every automaker has some electric vehicle program, but notes varying degrees of seriousness in their commitment. He expects the industry to largely transition to electric vehicles, and plans to continue leading Tesla's development of innovative technologies like the Model 3 and Tesla semi-truck,  emphasizing his long-term commitment to the company.",
     "metadata": {
@@ -462,7 +462,7 @@
     }
   },
   "42": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's timeline for achieving fully autonomous, cross-country driving in Tesla vehicles, and what data supports this claim?",
     "answer": "Musk anticipates achieving fully autonomous cross-country travel (e.g., Los Angeles to New York) by the end of 2017, primarily due to the massive dataset collected from a fleet of Teslas already driving on these roads.  He suggests this capability may extend beyond pre-programmed routes within two years.",
     "metadata": {
@@ -473,7 +473,7 @@
     }
   },
   "43": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk address the safety concerns surrounding fully autonomous driving, and what is his vision for the future of car ownership and usage based on this technology?",
     "answer": "Musk acknowledges that no system will be perfect, but aims for a level of safety where the likelihood of a crash is incredibly low (e.g., unlikely in a thousand lifetimes). His vision includes a shared autonomy fleet, where car owners can choose to use their vehicles exclusively or share them for profit, potentially covering lease costs or even making the car essentially \"free.\"",
     "metadata": {
@@ -484,7 +484,7 @@
     }
   },
   "44": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's approach to revealing information about Tesla's self-driving semi-truck and why is he cautious?",
     "answer": "Musk is planning a September announcement for the semi-truck, offering only a \"teaser shot\" for now. He emphasizes caution regarding the autonomy features of the truck.",
     "metadata": {
@@ -495,7 +495,7 @@
     }
   },
   "45": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the key features and capabilities of the Tesla Semi-truck, and how does it compare to diesel alternatives?",
     "answer": "The Tesla Semi is a heavy-duty, long-range electric truck designed to outperform diesel semis in terms of torque and range.  It boasts a flat torque RPM curve, enabling nimble handling despite its size, and unlike diesel trucks, it operates with a single-speed transmission.  Currently, it is not driverless but aims to be a desirable vehicle for professional truck drivers.",
     "metadata": {
@@ -506,7 +506,7 @@
     }
   },
   "46": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "Describe the Tesla solar glass roof tiles and their market advantages.",
     "answer": "The solar glass roof tiles are designed to be aesthetically indistinguishable from regular roof tiles from street level, while incorporating solar cells.  They are designed to be cost-competitive with traditional roofing plus electricity costs, offering long-term durability (implied near-infinity warranty).  Tesla plans to initially release two types of tiles, with two more to follow early next year.",
     "metadata": {
@@ -517,7 +517,7 @@
     }
   },
   "47": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is the scale of Tesla's ambition for the solar glass roof tile product?",
     "answer": "While not explicitly stated as a number, the implication is that Tesla aims for widespread adoption of the solar glass roof tiles, suggesting a large-scale ambition to significantly impact the roofing and renewable energy markets.",
     "metadata": {
@@ -528,7 +528,7 @@
     }
   },
   "48": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's vision for solar roof adoption and the key factor driving its economic viability?",
     "answer": "Musk envisions nearly universal solar roof adoption within 40-50 years, driven by the decreasing cost of lithium-ion batteries. He believes most US houses have sufficient roof space to meet their energy needs if solar power is effectively harnessed.  The falling cost of batteries makes this economically feasible.",
     "metadata": {
@@ -539,7 +539,7 @@
     }
   },
   "49": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does the Gigafactory contribute to Musk's overall vision, and what is the projected scale of its impact?",
     "answer": "The Gigafactory is crucial to Tesla's strategy by dramatically increasing the world's supply of lithium-ion batteries, a core competency for electric vehicles, solar roofs, and other energy products.  Musk anticipates building approximately 100 Gigafactories to transition the world away from fossil fuels.",
     "metadata": {
@@ -550,7 +550,7 @@
     }
   },
   "50": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk respond to criticism regarding his advisory role to someone who is skeptical about climate change?",
     "answer": "Musk doesn't directly answer the criticism in the provided excerpt but implies the need to address the global market and a global approach to sustainable energy solutions are paramount, indirectly justifying his involvement regardless of individual beliefs.",
     "metadata": {
@@ -561,7 +561,7 @@
     }
   },
   "51": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's perspective on the significance of SpaceX's reusable rocket technology and its role in the Mars colonization plan?",
     "answer": "Musk views the reusable rocket technology as crucial for making Mars colonization economically feasible.  Rapid and complete reusability, comparable to airplanes or cars, is essential. This technology enables the creation of a significantly larger and more powerful rocket capable of transporting massive payloads, including a fully loaded 747, into orbit—a pivotal step towards his ambitious Mars colonization goals.",
     "metadata": {
@@ -572,7 +572,7 @@
     }
   },
   "52": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is the scale and ambition of Elon Musk's Mars colonization plan, and what timeframe is he targeting?",
     "answer": "Musk's plan involves building a city on Mars with a million people.  The interplanetary transport system he envisions is massive, exceeding the Saturn V rocket in thrust by a factor of four.  While the visualization depicts a potential future 8-10 years out, internal targets are even more aggressive.  Future spacecraft are expected to dwarf even this currently enormous design.",
     "metadata": {
@@ -583,7 +583,7 @@
     }
   },
   "53": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk justify the need for a Mars city with a million inhabitants?",
     "answer": "The provided transcript excerpt does not fully answer *why* a million-person Mars city is necessary. It only states that having a Mars colony is important, suggesting the reasoning is implied but not explicitly detailed in this interview segment.",
     "metadata": {
@@ -594,7 +594,7 @@
     }
   },
   "54": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk justify his pursuit of seemingly disparate goals like sustainable energy and space colonization, addressing criticisms that one distracts from the other?",
     "answer": "Musk argues that sustainable energy is largely inevitable due to economic forces, while space colonization is not.  Tesla's value lies in accelerating sustainable energy's arrival. Space exploration, however, requires proactive effort and is crucial because it's not an automatic outcome of technological advancement; it's a necessary safeguard for humanity's long-term survival and a source of inspiration.",
     "metadata": {
@@ -605,7 +605,7 @@
     }
   },
   "55": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What role does the element of \"excitement\" or \"inspiration\" play in Musk's approach to achieving his long-term goals?",
     "answer": "Musk acknowledges that the value of beauty and inspiration is often underestimated. He uses exciting and aesthetically pleasing designs for his products (e.g., Tesla cars, Solar Roof) to achieve goals like sustainable energy adoption.  He views space exploration not only as a backup plan for humanity but also as a source of inspiration vital for motivating progress.  However, he explicitly denies seeking to be a \"savior.\"",
     "metadata": {
@@ -616,7 +616,7 @@
     }
   },
   "56": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk view the potential for technological regression and its implications for his long-term vision?",
     "answer": "Musk highlights the risk of technological regression, using examples of past civilizations losing knowledge and skills.  He emphasizes that technological progress is not automatic; it requires persistent, dedicated effort.  This underscores the urgency of his projects, particularly space colonization, as a safeguard against the potential loss of hard-won advancements.",
     "metadata": {
@@ -627,7 +627,7 @@
     }
   },
   "57": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is the interviewer's primary observation about Elon Musk's approach to dreaming and innovation?",
     "answer": "The interviewer highlights Musk's unique ability to dream and envision incredibly complex and ambitious innovations that others wouldn't even attempt.  This capacity is described as \"remarkable\" and inspiring to others.",
     "metadata": {
@@ -661,7 +661,7 @@
     }
   },
   "60": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's vision for a positive future, and what are the key components of his proposed solution to climate change?",
     "answer": "Musk envisions a future where humanity is excited about progress, not burdened by pessimism.  His solution to avoiding climate catastrophe centers on a rapid transition to a sustainable energy economy, achieved through three pillars: sustainable energy generation (primarily solar and wind), large-scale battery storage, and widespread electric transportation.  He believes that overcoming challenges related to battery production is crucial to achieving this vision.",
     "metadata": {
@@ -672,7 +672,7 @@
     }
   },
   "61": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What does Elon Musk identify as the primary bottleneck in achieving a sustainable energy future, and what is the scale of the challenge?",
     "answer": "Musk identifies battery cell production as the fundamental rate-limiting factor in transitioning to a sustainable energy economy. He estimates that the world will need to produce approximately 300 terawatt-hours of batteries (a very rough estimate) to achieve a complete transition of electricity generation, heating, and transportation.  The scaling of battery production is therefore a critical challenge.",
     "metadata": {
@@ -683,7 +683,7 @@
     }
   },
   "62": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk balance his optimism about the future with the urgency of addressing climate change?",
     "answer": "Musk maintains a cautiously optimistic outlook. While acknowledging the seriousness of climate change and the 2050 deadline, he believes that focused effort and a sense of urgency are key to avoiding catastrophe. He emphasizes the importance of avoiding complacency and actively working towards a sustainable energy future.  His optimism is contingent on continued proactive action.",
     "metadata": {
@@ -694,7 +694,7 @@
     }
   },
   "63": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Tesla's projected contribution to global sustainable energy infrastructure by 2050, and what is Musk's overall outlook on achieving a sustainable energy future?",
     "answer": "Musk estimates Tesla might contribute around 10% to the required 300 terawatt-hours of installed sustainable energy capacity by 2050.  He expresses strong optimism about humanity's ability to solve the sustainable energy challenge, envisioning a future with low-cost energy, carbon sequestration, and abundant freshwater resources as a result.",
     "metadata": {
@@ -705,7 +705,7 @@
     }
   },
   "64": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk explain the accuracy of some of his predictions (like Tesla vehicle sales) and the inaccuracy of others (like full self-driving timelines)?",
     "answer": "Musk doesn't offer a systematic explanation for differing prediction accuracy. He implicitly acknowledges that some predictions (like Tesla vehicle sales) were remarkably accurate, while others (like full self-driving) have proven less so. He highlights the annoyance caused by criticism of inaccurate predictions, emphasizing that these are estimations, not firm commitments.",
     "metadata": {
@@ -728,7 +728,7 @@
     }
   },
   "66": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's current approach to overcoming the challenges in full self-driving development, and what gives him confidence in achieving a significant breakthrough this year?",
     "answer": "Musk's strategy focuses on creating a high-quality unified vector space by processing synchronized video from eight cameras. This involves developing sophisticated software for labeling video data, utilizing a combination of human labeling and automated labeling to create a self-improving system. This approach aims to provide the car with a 3D model of its surroundings, moving beyond single-image recognition.  This iterative process, leveraging automation and human feedback, is what fuels his confidence in exceeding the accident rate of an average human driver this year.",
     "metadata": {
@@ -739,7 +739,7 @@
     }
   },
   "67": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How has the approach to data labeling evolved in the development of Tesla's full self-driving system?",
     "answer": "Initially, labeling individual images for image recognition proved insufficient.  The current approach utilizes surround video, requiring the development of custom labeling tools.  The process involves initially human labeling of synchronized video segments, followed by the development of auto-labeling software to increase efficiency.  The goal is a \"flywheel\" effect where auto-labeling accuracy continuously improves based on human corrections, leading to high-accuracy labeling of vast amounts of video data for crucial elements like cars, lane lines, and drivable space.",
     "metadata": {
@@ -750,7 +750,7 @@
     }
   },
   "68": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's current assessment of Tesla's Full Self-Driving (FSD) capabilities and timeline for achieving fully autonomous driving?",
     "answer": "Musk expresses increased confidence that FSD will achieve largely hands-free driving in many cities and circumstances by the end of the year, citing significant behind-the-scenes improvements and data from their 100,000+ beta testers.  He acknowledges it's still beta and incidents occur, but believes the progress warrants optimism.",
     "metadata": {
@@ -761,7 +761,7 @@
     }
   },
   "69": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk justify his history of seemingly optimistic predictions, particularly regarding timelines for technological advancements?",
     "answer": "Musk argues that aggressive internal timelines are necessary to drive progress,  and that media reporting tends to highlight missed predictions while ignoring successes. He contends that even if timelines are off, the ultimate achievement of the technology is more significant than minor delays.  He uses Tesla vehicle growth as an example where his prediction was exceeded.",
     "metadata": {
@@ -772,7 +772,7 @@
     }
   },
   "70": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the key technical challenges remaining in achieving fully autonomous driving, according to Musk's explanation?",
     "answer": "The main challenges involve predicting quirky pedestrian behaviors, managing limited onboard memory to process spatial and temporal information (handling occlusions like pedestrians obscured by vehicles), and ensuring safety in diverse real-world conditions.",
     "metadata": {
@@ -783,7 +783,7 @@
     }
   },
   "71": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What technological advancements at Tesla enabled the development of Optimus, and what key challenges remain?",
     "answer": "Tesla's work on Full Self-Driving provided the necessary real-world AI capabilities, adaptable to a humanoid robot.  The remaining challenges are achieving sufficient real-world intelligence for autonomous tasks and scaling up manufacturing—areas where Tesla excels.",
     "metadata": {
@@ -794,7 +794,7 @@
     }
   },
   "72": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the envisioned applications of Optimus, and what safety concerns does Musk foresee?",
     "answer": "Initial applications will focus on manufacturing, but the long-term vision includes household tasks like tidying, meal preparation, and elder care.  Musk emphasizes the need for safety features, including a non-updatable localized ROM chip to prevent remote control manipulation,  and advocates for AI regulatory agencies.",
     "metadata": {
@@ -805,7 +805,7 @@
     }
   },
   "73": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Musk's prediction for the future adoption rate of home robots?",
     "answer": "Musk believes that by 2050 or so, most homes will have a robot, acting as a personal \"butler\" or companion, fulfilling a wide range of functions as dictated by user preferences, even potentially including companionship roles.",
     "metadata": {
@@ -816,7 +816,7 @@
     }
   },
   "74": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's timeline and vision for the commercialization of humanoid robots, and what are the projected cost implications?",
     "answer": "Musk anticipates humanoid robots will be commercially available within less than 10 years, initially targeting businesses before expanding to consumer markets.  He projects the cost to be less than a car, potentially starting around $50,000 but decreasing to $20,000 or less within a few years due to increased production and technological advancements.",
     "metadata": {
@@ -827,7 +827,7 @@
     }
   },
   "75": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk address the potential economic and societal disruption caused by widespread adoption of humanoid robots?",
     "answer": "Musk views the widespread adoption of humanoid robots as leading to an \"age of abundance,\" where scarcity is minimized. He acknowledges the potential for job displacement but believes the overall economic benefits will outweigh the negative impacts.",
     "metadata": {
@@ -838,7 +838,7 @@
     }
   },
   "76": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are Elon Musk's primary concerns regarding the development and integration of advanced AI, and what is his proposed solution (Neuralink)?",
     "answer": "Musk's main concern is the potential for artificial general intelligence to decouple from human control and pursue unintended or undesirable goals.  His proposed solution, Neuralink, aims to create a tighter coupling between human consciousness and digital superintelligence, thereby mitigating this risk while also addressing neurological conditions.",
     "metadata": {
@@ -871,7 +871,7 @@
     }
   },
   "79": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk view the potential impact of Neuralink on human experience, both in the short and long term?",
     "answer": "In the short term, Neuralink aims to significantly improve the lives of individuals suffering from neurological injuries, such as severe depression, obesity, and memory loss.  Long-term, the technology is envisioned to create a symbiotic relationship between human and artificial intelligence, mitigating potential civilizational risks associated with advanced AI.",
     "metadata": {
@@ -882,7 +882,7 @@
     }
   },
   "80": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk characterize the relationship between the human brain's limbic system and cortex, and how does this relate to his vision for neuralink?",
     "answer": "Musk uses the analogy of a \"monkey with a computer stuck on its brain\" to illustrate the limitations of the human brain's current interface with technology. He argues that while we possess both a \"limbic system\" (instinctual) and a \"cortex\" (rational), the communication between these, and with external technology (a \"tertiary layer\"), is slow and inefficient. Neuralink aims to improve this communication, potentially leading to breakthroughs in treating brain injuries and unlocking new human capabilities.",
     "metadata": {
@@ -893,7 +893,7 @@
     }
   },
   "81": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the key design goals and projected cost-effectiveness of Starship, and what is Musk's timeline for its Mars missions?",
     "answer": "Starship's primary design goal is full and rapid reusability, aiming for immediate reflight after propellant refilling. This is projected to drastically reduce the cost per launch, making it significantly cheaper to send 100 tons to orbit than even smaller, expendable rockets like Falcon 1. The timeline for Mars missions involves first sending equipment (unmanned), then sending humans, ultimately aiming for the transport of 100 people at a time.  Specific timelines are not provided.",
     "metadata": {
@@ -915,7 +915,7 @@
     }
   },
   "83": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is the primary function and intended use of Starship, according to Elon Musk?",
     "answer": "Starship is designed as a generalized transportation system for travel anywhere within the solar system, with a primary focus on Mars colonization but also encompassing lunar missions and potential exploration of other planets and celestial bodies.  It utilizes in-situ resource utilization (ISRU) for propellant production, eliminating the need for return fuel transportation.",
     "metadata": {
@@ -948,7 +948,7 @@
     }
   },
   "86": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's vision for a Martian city, and what is the rationale behind its projected size and cost?",
     "answer": "Musk envisions a self-sustaining Martian city populated by a million people.  This number is necessary to ensure the city's survival even if Earth-based support ceases.  The projected cost of around $100,000 per person aims to make Mars colonization accessible to a broader population, though he acknowledges the harsh realities and risks involved.",
     "metadata": {
@@ -959,7 +959,7 @@
     }
   },
   "87": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "Why does Elon Musk believe establishing a Martian city is crucial for humanity's future?",
     "answer": "Musk argues that establishing a multi-planetary civilization is critical to maximizing the lifespan of humanity and consciousness.  He emphasizes the existential threats facing Earth (meteor impacts, climate change, war) and views Mars colonization as a critical step to avoiding extinction, akin to overcoming a \"great filter\" that may have extinguished other civilizations.",
     "metadata": {
@@ -970,7 +970,7 @@
     }
   },
   "88": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's perspective on governance and societal structures for the Martian colony?",
     "answer": "Musk believes the governance of the Martian city will ultimately be determined by its inhabitants. While acknowledging potential risks associated with this, he expresses hope that Martian society will be more enlightened and avoid the conflicts prevalent on Earth. He offers potential recommendations but acknowledges that the ultimate decision lies with the future Martian population.",
     "metadata": {
@@ -992,7 +992,7 @@
     }
   },
   "90": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are the potential terrestrial applications and synergies between SpaceX's Starship program and Musk's other ventures (Tesla, Boring Company)?",
     "answer": "Starship's potential extends beyond space exploration.  Synergies exist with Tesla (robotics for Mars city construction), the Boring Company (creating subterranean infrastructure and rapid transit systems), potentially revolutionizing terrestrial transportation through a network of tunnels and robo-taxis, even enabling faster city-to-city transport.",
     "metadata": {
@@ -1003,7 +1003,7 @@
     }
   },
   "91": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Musk address the inherent risks and potential for catastrophic failure associated with rocket technology and SpaceX's ambitious goals?",
     "answer": "Musk acknowledges the significant risks involved in rocketry, referencing past failures (\"We've had many Hindenburg moments\"), emphasizing the immense energy involved and the difficulty of overcoming Earth's gravity. However, he expresses high confidence in SpaceX's ability to overcome these challenges and achieve full and rapid reusability.",
     "metadata": {
@@ -1014,7 +1014,7 @@
     }
   },
   "92": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are Elon Musk's current thoughts on consolidating his various companies (Tesla, SpaceX, Boring Company, Neuralink) into a single entity, and what are the primary obstacles he sees?",
     "answer": "Musk acknowledges the potential synergies between his companies in creating an exciting future, but highlights significant challenges.  These include the differing investor bases, vastly different company sizes (Tesla being significantly larger), and the substantial overhead and legal burdens associated with a large public company.  He also notes that he doesn't actively participate in the boards of his smaller companies.",
     "metadata": {
@@ -1025,7 +1025,7 @@
     }
   },
   "93": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk manage the psychological and practical challenges of his immense wealth and the pressure to optimize his time across multiple high-stakes ventures?",
     "answer": "Musk describes his wealth as \"bonkers\" but states he doesn't dwell on it.  He prioritizes maximizing his productive time, pushing himself \"to the edge of sanity,\" to benefit Tesla and SpaceX, recognizing the significant impact even small increments of his focused effort have on these companies.",
     "metadata": {
@@ -1036,7 +1036,7 @@
     }
   },
   "94": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What is Elon Musk's perspective on the feasibility of making SpaceX a public company, given Tesla's success?",
     "answer": "While he'd like to give the public access to ownership of SpaceX, Musk is concerned about the increased overhead and legal challenges that come with being a public company. He suggests that Tesla's current financial strength could potentially alleviate some concerns by funding SpaceX's ambitious goals directly, potentially attracting significant investor interest.",
     "metadata": {
@@ -1047,7 +1047,7 @@
     }
   },
   "95": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk justify his wealth and address criticisms of billionaire wealth inequality?",
     "answer": "Musk counters criticisms by emphasizing his lack of personal extravagance (no home, yacht, or extensive vacations), arguing that his wealth is reinvested into ventures aimed at solving global problems like climate change (Tesla), ensuring humanity's survival (SpaceX), and advancing human understanding (Neuralink, Boring Company). He frames these ventures as forms of philanthropy, focusing on impact rather than personal consumption.",
     "metadata": {
@@ -1058,7 +1058,7 @@
     }
   },
   "96": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What are Elon Musk's primary motivations behind his various business ventures?",
     "answer": "Musk's core motivation is a deep sense of moral purpose and a desire to secure a positive future for humanity. This includes addressing climate change, ensuring long-term survival, advancing human understanding, and expanding consciousness.  He sees his companies as vehicles for achieving these goals, framing them as philanthropic endeavors focused on improving humanity's lot.",
     "metadata": {
@@ -1069,7 +1069,7 @@
     }
   },
   "97": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk view the criticism he receives regarding his wealth and the impact of his work?",
     "answer": "Initially, Musk expresses some frustration with the criticism, particularly from those who prioritize wealth equality over solving climate change. However, he ultimately states that the criticism has become less impactful (\"a duck's back\").  His focus remains on the substantial positive impact of his ventures, which he views as overriding any negative perceptions.",
     "metadata": {
@@ -1080,7 +1080,7 @@
     }
   },
   "98": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "How does Elon Musk personally feel about the future, and what are his primary concerns?",
     "answer": "Musk acknowledges experiencing sadness at times but expresses overall optimism. His main concerns revolve around population collapse, climate change, and securing the future of consciousness by becoming a multi-planet species. He views these as existential risks requiring proactive action.",
     "metadata": {
@@ -1091,7 +1091,7 @@
     }
   },
   "99": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What advice does Musk offer to a generation feeling pessimistic about the future?",
     "answer": "Musk encourages proactive engagement. He asserts that a positive future requires active participation and that taking action is the key to achieving a desirable outcome.",
     "metadata": {
@@ -1102,7 +1102,7 @@
     }
   },
   "100": {
-    "personality": "unknown",
+    "personality": "elon",
     "question": "What overarching theme unites Musk's concerns about the future?",
     "answer": "The overarching theme is the preservation and advancement of consciousness, encompassing the need to address existential risks to ensure the long-term survival and prosperity of humanity.  This includes tackling population decline, climate change, and establishing a multi-planetary presence.",
     "metadata": {
@@ -1113,7 +1113,7 @@
     }
   },
   "101": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the central theme of the series David Attenborough is introducing?",
     "answer": "The series will celebrate the remaining natural wonders of our planet and reveal what must be preserved to ensure the survival and thriving of both people and nature, particularly highlighting the impact of human activity on the polar regions.",
     "metadata": {
@@ -1124,7 +1124,7 @@
     }
   },
   "102": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the significant impact of human activity on the Antarctic environment?",
     "answer": "Attenborough points to the unintentional changes humans are causing in the frozen worlds of the polar regions, specifically mentioning the melting sea ice and its consequences for the Antarctic ecosystem.  He highlights that these changes won't just affect the poles, but the entire planet.",
     "metadata": {
@@ -1135,7 +1135,7 @@
     }
   },
   "103": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What challenges do gentoo penguins face in reaching their breeding grounds, and how do they overcome them?",
     "answer": "Gentoo penguins face a difficult uphill struggle to reach their ice-free nesting grounds, a scarce resource in Antarctica.  Despite this arduous journey, their persistence and the established paths carved by generations of penguins allow them to reach the bare rock necessary for egg-laying.  The male penguin's gift of a stone to his mate highlights their dedication to reproduction.",
     "metadata": {
@@ -1146,7 +1146,7 @@
     }
   },
   "104": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does the melting sea ice impact the Antarctic ecosystem, specifically concerning krill and penguins?",
     "answer": "The melting sea ice allows sunlight to reach trapped algae, creating a flourishing ecosystem under the ice, providing food for Antarctic krill.  However, once the ice melts completely, the krill lose their protection, making them vulnerable to predators.  The increasing numbers of gentoo penguins in this area, correlated with rising temperatures, suggests a shift in the ecosystem.",
     "metadata": {
@@ -1179,7 +1179,7 @@
     }
   },
   "107": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough describe the hunting strategies of orcas in Antarctica?",
     "answer": "Attenborough describes orcas as stealth hunters specializing in penguins.  They utilize their numbers to overcome the penguins' individual maneuverability, passing hunting skills down through generations.",
     "metadata": {
@@ -1190,7 +1190,7 @@
     }
   },
   "108": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the central ecological importance of Antarctica's sea ice, according to Attenborough?",
     "answer": "Attenborough highlights that all life in the Antarctic, from killer whales to krill, ultimately depends on the sea ice.  The sea ice's influence on nutrient-rich waters supports a vast and diverse ecosystem.",
     "metadata": {
@@ -1201,7 +1201,7 @@
     }
   },
   "109": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough contrast the Antarctic environment with that of South Georgia Island?",
     "answer": "Attenborough contrasts the harsh, ice-covered Antarctic seas with the more temperate environment of South Georgia Island, which lies far enough north to avoid the sea ice and thus supports year-round animal populations.",
     "metadata": {
@@ -1224,7 +1224,7 @@
     }
   },
   "111": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does the presence of leopard seals illustrate the broader ecological challenges faced by the king penguin and albatross populations in South Georgia?",
     "answer": "The prolonged stay of leopard seals in South Georgia due to plentiful king penguin prey demonstrates an altered ecological balance.  While the albatross chick is safe from land predators, the ocean poses a significant threat to both king penguins (as prey for leopard seals) and adult albatross (via long-line fishing), illustrating the interconnectedness of the ecosystem and the multiple pressures impacting its inhabitants.",
     "metadata": {
@@ -1235,7 +1235,7 @@
     }
   },
   "112": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What are the primary dangers and challenges the penguin faces in returning to its chick?",
     "answer": "The penguin faces multiple threats:  predation from leopard seals (razor-sharp teeth vs. stabbing beak), exhaustion after a long chase, navigating a crowded and potentially dangerous beach environment with aggressive elephant seals, and finally, locating its chick within a massive colony.",
     "metadata": {
@@ -1246,7 +1246,7 @@
     }
   },
   "113": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough highlight the difficulty of the penguin's task of finding its chick?",
     "answer": "Attenborough emphasizes the scale of the challenge by describing the massive size of the penguin colony (half a million chicks), the potential distance the chick could be from its parent, and the general chaos and movement within the colony, making the search incredibly difficult.  He uses the phrase \"chicks are never where you left them\" to illustrate the unpredictability of the task.",
     "metadata": {
@@ -1257,7 +1257,7 @@
     }
   },
   "114": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the overall message conveyed regarding the penguin's journey?",
     "answer": "The penguin's journey highlights the immense challenges faced by animals in the wild, even seemingly small creatures like penguins.  It showcases the constant struggle for survival and the remarkable resilience and determination of wildlife.",
     "metadata": {
@@ -1290,7 +1290,7 @@
     }
   },
   "117": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the overall message conveyed regarding the interconnectedness of the ecosystem and the impact of climate change?",
     "answer": "The narrative highlights the intricate relationships within ecosystems. The disappearance of sea ice in both the Arctic and Antarctic has cascading effects throughout the food web.  Changes impacting one species (e.g., krill, seals) directly impact others (e.g., South Georgia's wildlife, polar bears), demonstrating the far-reaching consequences of climate change.",
     "metadata": {
@@ -1301,7 +1301,7 @@
     }
   },
   "118": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the complex survival strategies of polar bears, particularly focusing on hunting seals?",
     "answer": "Attenborough describes the crucial teamwork between mother and cub polar bears in hunting seals, highlighting the need for stealth, precise coordination, and the high failure rate of hunts.  He emphasizes the vulnerability of lone seal pups and the mother's reliance on the pup's ability to return to safety.",
     "metadata": {
@@ -1312,7 +1312,7 @@
     }
   },
   "119": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What larger environmental concern does Attenborough connect to the polar bear's hunting challenges?",
     "answer": "Attenborough links the polar bears' reliance on sea ice for hunting to the threat of climate change.  The annual retreat of sea ice and its eventual disappearance are presented as existential threats to the polar bear population.",
     "metadata": {
@@ -1324,7 +1324,7 @@
     }
   },
   "120": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What crucial role does sea ice play in the Arctic ecosystem and the global climate, and what are the consequences of its decline?",
     "answer": "Sea ice is vital for Arctic creatures like narwhals, providing refuge from predators and access to feeding grounds.  Globally, it acts as a protective shield, reflecting sunlight and keeping the Earth cool.  Its shrinking extent due to Arctic warming (twice the rate of the global average) will have devastating consequences for Arctic wildlife and contribute to global warming.",
     "metadata": {
@@ -1380,7 +1380,7 @@
     }
   },
   "125": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the primary observation Attenborough makes regarding Arctic wildlife and climate change?",
     "answer": "Attenborough observes that mass gatherings of walruses are becoming increasingly frequent, and that the lives of walruses, polar bears, and seals are being negatively impacted by climate change, as they live at the \"frontier\" of its effects.",
     "metadata": {
@@ -1391,7 +1391,7 @@
     }
   },
   "126": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is Attenborough's overall message regarding the future of Arctic wildlife and the need for action?",
     "answer": "While there is temporary relief with the return of winter and sea ice, Attenborough emphasizes the precariousness of the situation and implies the urgent need for action to preserve the Arctic wilderness before it's too late.  He directly prompts the audience to visit a website to learn more about what can be done.",
     "metadata": {
@@ -1403,7 +1403,7 @@
     }
   },
   "127": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the central message Attenborough conveys regarding the relationship between humanity and nature over the past 50 years?",
     "answer": "Attenborough highlights the dramatic decline in wildlife populations (60% on average) since the moon landing, contrasting the previously stable \"Eden\" with the current precarious state of nature. He emphasizes the need for understanding and preserving the natural world for the continued thriving of both humanity and nature.",
     "metadata": {
@@ -1414,7 +1414,7 @@
     }
   },
   "128": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What specific example does Attenborough use to illustrate the scale of remaining natural wonders and wildlife abundance?",
     "answer": "Attenborough describes the astonishing daily migration of five million seabirds (cormorants and boobies) along the Peruvian coast, showcasing the richness and scale of life that still exists in certain, precious locations.",
     "metadata": {
@@ -1425,7 +1425,7 @@
     }
   },
   "129": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is Attenborough's call to action based on his observations?",
     "answer": "Attenborough urges a greater understanding of how the natural world works and emphasizes the crucial need for human intervention to help the planet recover and ensure the continued flourishing of both humanity and nature.",
     "metadata": {
@@ -1436,7 +1436,7 @@
     }
   },
   "130": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the interconnectedness of marine life and seemingly distant ecosystems?",
     "answer": "Attenborough demonstrates this interconnectedness by showing how nutrient-rich currents from the Antarctic (Humboldt Current) support abundant life near the coast, while dust from distant deserts, carried by winds, provides nutrients for microscopic organisms forming the base of the oceanic food web, ultimately influencing even the behavior of dolphins and birds.",
     "metadata": {
@@ -1447,7 +1447,7 @@
     }
   },
   "131": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What specific examples does Attenborough use to highlight the intricate food web and predator-prey relationships in the ocean?",
     "answer": "He describes the feeding frenzy of boobies on anchovies driven by the Humboldt Current, the dolphins hunting mackerel that feed on krill, and the coordinated hunting of mackerel by shearwaters and dolphins, showcasing various levels of the food chain and their interdependency.",
     "metadata": {
@@ -1459,7 +1459,7 @@
     }
   },
   "132": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough contrast the productivity of coastal waters with the open ocean?",
     "answer": "He contrasts the \"blue desert\" of the open ocean with the abundance of life in shallow coastal seas, highlighting that 90% of ocean life is found near the coast due to nutrient availability, but even the open ocean benefits from nutrients transported from distant deserts via wind-blown dust.",
     "metadata": {
@@ -1470,7 +1470,7 @@
     }
   },
   "133": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the interconnectedness of Earth's ecosystems and the impact of uneven water distribution?",
     "answer": "Attenborough uses the example of a vast, arid salt pan in Africa to show how the uneven distribution of rainfall drastically affects life.  He explains the crucial role of water cycling from sea to land, highlighting that even in harsh environments, life persists and adapts, albeit sporadically, to periods of intense rainfall. The example of flamingos breeding only during infrequent deluges emphasizes the delicate balance and dependence on water availability.",
     "metadata": {
@@ -1481,7 +1481,7 @@
     }
   },
   "134": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What specific adaptations does Attenborough highlight in the flamingos' behavior and the environment's response to infrequent rainfall?",
     "answer": "Attenborough describes how flamingos breed only when perfect conditions (heavy rainfall) occur, perhaps only once a decade. He points out that algae, their food source, survive as dormant spores in the dust until rain revives them.  The flamingos' nesting strategy—building mud mounds to keep eggs cool and choosing a salty island for protection from predators—demonstrates their remarkable adaptation to the harsh and unpredictable environment.",
     "metadata": {
@@ -1493,7 +1493,7 @@
     }
   },
   "135": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What are the major challenges faced by young flamingos during their early life, as depicted by Attenborough?",
     "answer": "Young flamingos face a perilous journey of up to 50 kilometers in search of freshwater, often hampered by salt build-up on their legs and the inability of some to keep pace.  Their survival depends on predictable rainfall, which dictates food availability and their overall well-being.",
     "metadata": {
@@ -1504,7 +1504,7 @@
     }
   },
   "136": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough contrast the challenges of the flamingos with the relative abundance of life in the Serengeti?",
     "answer": "Attenborough contrasts the precarious survival of the flamingos, heavily reliant on unpredictable rainfall, with the thriving wildebeest population of the Serengeti, which flourishes due to the more predictable seasonal rains allowing for consistent grazing and successful calving.",
     "metadata": {
@@ -1516,7 +1516,7 @@
     }
   },
   "137": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the delicate balance of life in the African savanna, using the example of wildebeest and hunting dogs?",
     "answer": "Attenborough highlights the interdependence of predator and prey, showing how the wildebeest calf's survival depends on staying with the herd for protection from hunting dogs, while the dogs' success hinges on isolating a calf.  This illustrates the constant struggle for survival shaping the ecosystem.",
     "metadata": {
@@ -1527,7 +1527,7 @@
     }
   },
   "138": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What broader point does Attenborough make about biodiversity and interconnectedness, contrasting the savanna with tropical forests?",
     "answer": "Attenborough contrasts the savanna's dependence on rainfall and open grasslands with the incredible biodiversity of tropical rainforests. He emphasizes the intricate relationships within rainforest ecosystems, highlighting the interdependence of plants and animals (e.g., pollination) as crucial for their survival and overall richness.",
     "metadata": {
@@ -1538,7 +1538,7 @@
     }
   },
   "139": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough describe the symbiotic relationship between orchid bees and orchids?",
     "answer": "Attenborough describes a mutually beneficial relationship where orchids use a clever trap involving a slippery bucket of sticky liquid and a narrow tunnel to attach pollen sacs to male orchid bees.  In return, the bees receive a valuable perfume to attract females.",
     "metadata": {
@@ -1549,7 +1549,7 @@
     }
   },
   "140": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What examples does Attenborough give to illustrate the elaborate mating rituals of rainforest birds?",
     "answer": "Attenborough highlights the diverse and elaborate mating dances of rainforest birds, including the golden-collared mannequin's backflip with a twist, the red-capped mannequin's wing-snapping display, and the blue mannequin's synchronized group dance involving a lead male and three junior dancers.",
     "metadata": {
@@ -1571,7 +1571,7 @@
     }
   },
   "142": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the interdependence of species within the boreal forest ecosystem, using the example of caribou and wolves?",
     "answer": "Attenborough describes the caribou's migration south to the boreal forest for winter survival, highlighting the forest as a crucial refuge.  He then shows how wolves track and prey upon the caribou, demonstrating the predator-prey relationship and the delicate balance within this ecosystem.",
     "metadata": {
@@ -1582,7 +1582,7 @@
     }
   },
   "143": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What contrast does Attenborough draw between tropical and boreal forests, and what key characteristic of the boreal forest does he emphasize?",
     "answer": "Attenborough contrasts the consistently warm and diverse tropical forests (covering only 7% of the land) with the seasonal and colder boreal forests which extend across North America and Eurasia.  He emphasizes the boreal forest's crucial role as a refuge for a limited number of species adapted to survive its harsh winter conditions.",
     "metadata": {
@@ -1594,7 +1594,7 @@
     }
   },
   "144": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does Attenborough illustrate the precarious balance of life in the Arctic and the impact of climate change on predator-prey dynamics?",
     "answer": "Attenborough uses the example of wolves hunting caribou in the forest, highlighting how the wolves' strategic hunting is impacted by the caribou's need to reach the tundra for calving.  He then contrasts this with the dramatic decline in caribou numbers (70% in 20 years) and the shrinking sea ice impacting polar bears' hunting capabilities, directly linking these events to rapid climate change in the polar regions.",
     "metadata": {
@@ -1605,7 +1605,7 @@
     }
   },
   "145": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the central message conveyed by Attenborough regarding the changing Arctic environment and its broader implications?",
     "answer": "The Arctic's rapid warming, exemplified by the disappearing sea ice and its devastating effect on polar bears and caribou populations, highlights the fragility of even the most remote ecosystems and underscores the urgent global threat posed by climate change. The stability of these polar regions is crucial for the entire planet.",
     "metadata": {
@@ -1617,7 +1617,7 @@
     }
   },
   "146": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the primary threat facing polar bear cubs and the Arctic ecosystem, as described by Attenborough?",
     "answer": "The primary threat is the rapid melting of both sea ice and land-based glacial ice in the Arctic, driven by accelerating global warming. This loss of ice reduces polar bear cubs' survival chances due to underweight conditions and diminishes the planet's natural protection against overheating.",
     "metadata": {
@@ -1628,7 +1628,7 @@
     }
   },
   "147": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "How does the melting of Arctic ice specifically impact the planet's climate, according to Attenborough?",
     "answer": "The melting of both sea and glacial ice in the Arctic reduces the planet's ability to reflect solar radiation. This loss of reflective surface leads to increased absorption of heat, accelerating global warming and further ice melt, creating a feedback loop.",
     "metadata": {
@@ -1640,7 +1640,7 @@
     }
   },
   "148": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is the central concern David Attenborough highlights regarding the accelerating melting of ice?",
     "answer": "Attenborough emphasizes the dramatically increased rate of ice melt, nearly double that of a decade ago, leading to rising sea levels, altered salinity, disrupted ocean currents, and the destabilization of crucial ecosystems vital for all life on Earth.  This disruption threatens the stability of the planet's interconnected systems.",
     "metadata": {
@@ -1651,7 +1651,7 @@
     }
   },
   "149": {
-    "personality": "unknown",
+    "personality": "david_attenborough",
     "question": "What is Attenborough's call to action and the overall message conveyed in this excerpt?",
     "answer": "Attenborough urges immediate action within the next 20 years to determine the future of life on Earth.  He stresses the interconnectedness of ecosystems and the need for preservation to allow humans and nature to thrive.  The excerpt ends with a hopeful musical element suggesting collaboration and the possibility of change if humans act decisively.",
     "metadata": {
@@ -1662,7 +1662,7 @@
     }
   },
   "150": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is Morgan Freeman's central inquiry in this excerpt, and how does he begin to address it?",
     "answer": "Freeman's central inquiry is to understand why so many religions predict an apocalypse and the role of Jerusalem in these prophecies. He begins by highlighting the long history of apocalyptic predictions and then travels to Jerusalem, a significant site for multiple religions, to speak with an expert on its religious and political significance.",
     "metadata": {
@@ -1673,7 +1673,7 @@
     }
   },
   "151": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "According to Yoram Hazani (as relayed by Freeman), what are the key reasons the Jewish Temple hasn't been rebuilt on the Temple Mount?",
     "answer": "Hazani states that the Temple hasn't been rebuilt due to a two-fold reason:  the Jews themselves are not yet ready, and neither are the Muslims.  This highlights the complex political and religious tensions surrounding the site.",
     "metadata": {
@@ -1750,7 +1750,7 @@
     }
   },
   "158": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Morgan Freeman frame the connection between the Essenes' apocalyptic beliefs and the later Christian concept of the end times?",
     "answer": "Freeman suggests a lineage between the Essenes' apocalyptic worldview and the Christian concept of the end times as depicted in the Book of Revelation. He implies that the idea of an apocalyptic battle with forces of darkness, while manifesting differently, persisted and evolved through history, influencing later religious beliefs.",
     "metadata": {
@@ -1893,7 +1893,7 @@
     }
   },
   "171": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does the Karmapa's understanding of apocalypse differ from Western perspectives, and what is his approach to achieving enlightenment?",
     "answer": "The Karmapa explains that the Buddhist view of apocalypse is not a violent end but a personal revelation of truth – enlightenment.  He emphasizes self-recognition (\"Where do I come from? Why am I here?\") and meditation as key steps towards achieving this enlightenment, focusing on breath and present moment awareness to relax the mind.",
     "metadata": {
@@ -1926,7 +1926,7 @@
     }
   },
   "174": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is Morgan Freeman's perspective on the Buddhist concept of the end of time, compared to the Western idea of apocalypse?",
     "answer": "Freeman explains that Buddhism doesn't view the end of time as a final judgment but rather as continuous change.  One thing ends, and another begins; there's no absolute ending, only transformation.",
     "metadata": {
@@ -1937,7 +1937,7 @@
     }
   },
   "175": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How did the experience of Hurricane Katrina impact the perspective of one of Freeman’s interviewees regarding the concept of “the end”?",
     "answer": "The interviewee described experiencing eight feet of water and losing everything, stating that the event \"did seem like the end to me\".  This contrasts with Freeman's earlier discussion of Buddhism's view of cyclical change rather than finality.",
     "metadata": {
@@ -1970,7 +1970,7 @@
     }
   },
   "178": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is Morgan Freeman's perspective on the meaning of \"apocalypse,\" and how does this relate to the Hurricane Katrina experience in New Orleans?",
     "answer": "Freeman reframes the traditional understanding of \"apocalypse\" from a destructive doomsday to a state of enlightenment and a chance for renewal.  He sees the Hurricane Katrina experience not as divine punishment, but as a catalyst for community rebuilding and spiritual growth, highlighting the positive changes and new beginnings that arose from the devastation.",
     "metadata": {
@@ -1992,7 +1992,7 @@
     }
   },
   "180": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is Morgan Freeman's central message regarding the human relationship with the universe?",
     "answer": "Freeman emphasizes the ongoing human adventure of exploring and understanding the universe, questioning our perception of scale and our place within the cosmos, highlighting the continuous journey of discovery.",
     "metadata": {
@@ -2003,7 +2003,7 @@
     }
   },
   "181": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Freeman contrast human perception with the vastness of the universe?",
     "answer": "Freeman contrasts our everyday, human-centered scale of measurement with the incomprehensible scales present in the universe, prompting us to question what is truly \"large\" and \"small\" beyond our immediate experience.",
     "metadata": {
@@ -2015,7 +2015,7 @@
     }
   },
   "182": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Morgan Freeman's narration illustrate the vastness of the universe and the progression of human understanding of it?",
     "answer": "Freeman uses a scaling analogy, starting from the small scale of a meter-wide acrobats' ring in St. Mark's Square, Venice, and progressively expanding outwards by powers of ten to encompass Venice, Europe, Earth, the solar system, and finally, the sun as just one star among countless others.  He highlights the historical context, showing how early estimations and Galileo's telescope revolutionized our understanding of the cosmos.",
     "metadata": {
@@ -2048,7 +2048,7 @@
     }
   },
   "185": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Morgan Freeman illustrate the vastness and scale of the universe, contrasting it with the microscopic world?",
     "answer": "Freeman uses the concept of light years to illustrate the immense scale of the universe, journeying from our solar system to the outer limits of the visible universe (15 billion light years). He then contrasts this with a journey into the microscopic world, starting with a drop of water, moving to single-celled organisms, then to the cell nucleus, and finally to the atom, demonstrating the vastness of scale in both directions.",
     "metadata": {
@@ -2059,7 +2059,7 @@
     }
   },
   "186": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What key scientific advancements does Freeman highlight to emphasize our ability to explore both the macrocosm and microcosm?",
     "answer": "Freeman mentions Galileo's telescope, enabling outward exploration of the cosmos, and Antony van Leeuwenhoek's microscope, enabling inward exploration of the microscopic world.  These advancements, spanning centuries, are presented as crucial tools for expanding human understanding of both the extremely large and the extremely small.",
     "metadata": {
@@ -2070,7 +2070,7 @@
     }
   },
   "187": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is the overall message conveyed through Freeman's narration about the scales of the universe and the microscopic world?",
     "answer": "The narration emphasizes the boundless nature of both the universe and the microscopic world, highlighting the incomprehensible scale and complexity of existence at both ends of the spectrum.  It encourages wonder and a sense of humility in the face of the vast unknown.",
     "metadata": {
@@ -2081,7 +2081,7 @@
     }
   },
   "188": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Morgan Freeman's narration illustrate the scale and mystery of the universe, focusing on the subatomic level?",
     "answer": "Freeman uses vivid analogies (theater-sized atom with a dust-speck nucleus) to convey the immense scale difference between the atom and its nucleus, emphasizing the mystery surrounding quarks and the possibility of even smaller building blocks of matter.  He connects this subatomic exploration to the Big Bang and the universe's expansion, highlighting the vastness of time and space involved in understanding the universe's origins.",
     "metadata": {
@@ -2092,7 +2092,7 @@
     }
   },
   "189": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is the central scientific process described by Freeman regarding the investigation of the universe's origins?",
     "answer": "Scientists at Fermilab use a particle accelerator to recreate conditions similar to those immediately after the Big Bang. By studying the resulting quark collisions, they attempt to understand the universe's early state, its expansion, and the formation of matter from quarks into protons, neutrons, and eventually atoms.  This involves observing the traces of quarks and extrapolating backwards in time to the initial explosion and subsequent development.",
     "metadata": {
@@ -2103,7 +2103,7 @@
     }
   },
   "190": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Freeman's narration connect the subatomic world with the large-scale structure of the universe?",
     "answer": "Freeman connects the two by tracing the evolution of matter from the smallest particles (quarks) to the formation of atoms, then galaxies, and ultimately the large-scale structure of the cosmos. The Big Bang and the subsequent expansion of the universe provide the overarching framework connecting these vastly different scales.  The study of quarks at Fermilab directly relates to understanding the very early universe and its subsequent evolution into the universe we observe today.",
     "metadata": {
@@ -2114,7 +2114,7 @@
     }
   },
   "191": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Morgan Freeman describe the formation of our solar system and the conditions on early Earth?",
     "answer": "Freeman narrates the cosmic evolution from galactic collisions and supernovae creating the elements of life, to the formation of our sun and planets. He describes early Earth as a hostile environment bombarded by cosmic debris, with volcanic activity, acid rain, and intense UV radiation, but already containing the basic ingredients for life (water, carbon, and energy).  Life began with simple bacteria, which over millions of years changed the atmosphere by releasing oxygen and forming the ozone layer.",
     "metadata": {
@@ -2125,7 +2125,7 @@
     }
   },
   "192": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What role do supernovae play in the creation of life as described by Morgan Freeman?",
     "answer": "Supernovae, or exploding stars, are crucial because they disperse the elements necessary for life – oxygen, carbon, and iron – throughout the cosmos.  These elements become incorporated into new stars and planets.",
     "metadata": {
@@ -2136,7 +2136,7 @@
     }
   },
   "193": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is the central theme of Morgan Freeman's narration regarding the history of life on Earth?",
     "answer": "The narration traces the evolution of life from its origins in Earth's waters, highlighting the diversification of life forms, the colonization of land, and the eventual emergence of complex organisms, culminating in the rise of vertebrates and their adaptation to diverse environments.",
     "metadata": {
@@ -2147,7 +2147,7 @@
     }
   },
   "194": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "How does Freeman's narration connect the history of life on Earth to the exploration of the cosmos?",
     "answer": "Freeman draws a parallel between the Earth's biological evolution – a journey of exploration, invention, and adaptation – and humanity's current cosmic exploration. He positions this exploration as a continuation of the inherent human drive for discovery, utilizing advanced technology (like the Hubble Telescope) to reach previously unimaginable realms, just as life on Earth diversified and adapted to new environments.",
     "metadata": {
@@ -2158,7 +2158,7 @@
     }
   },
   "195": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What is Morgan Freeman's perspective on the search for extraterrestrial life and the implications of its discovery?",
     "answer": "Freeman highlights the vast potential for Earth-like planets and the ongoing search for alien civilizations through radio telescopes.  He emphasizes that detecting a signal would fundamentally alter our understanding of ourselves and the universe.",
     "metadata": {
@@ -2169,7 +2169,7 @@
     }
   },
   "196": {
-    "personality": "unknown",
+    "personality": "morgan_freeman",
     "question": "What does Morgan Freeman see as the driving force and ultimate goal behind humanity's exploration of the universe?",
     "answer": "Freeman suggests that understanding the universe is crucial to understanding humanity's destiny.  The exploration of space and the pursuit of answers to cosmic questions are presented as ongoing, ambitious endeavors that will challenge future generations.",
     "metadata": {
