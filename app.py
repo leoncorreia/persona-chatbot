@@ -67,7 +67,7 @@ if query:
         results = retrieve_similar_qa(query, index, qa_lookup, embedding_model)
         response = query_llm(query, results)
 
-    st.markdown("### 💬 Gemini Response:")
+    st.markdown("### 💬 Response:")
     st.success(response)
 
     with st.expander("🧠 Show Retrieved Q&A Context"):
