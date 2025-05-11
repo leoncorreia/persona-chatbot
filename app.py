@@ -12,7 +12,7 @@ st.title("🎙️ Persona-Based Q&A Chatbot")
 @st.cache_resource
 def load_components():
     model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-    index = faiss.read_index("faiss_index.index")
+    index = faiss.read_index("qa_index.index")
     with open("qa_lookup.json", "r", encoding="utf-8") as f:
         lookup = json.load(f)
     return model, index, lookup
