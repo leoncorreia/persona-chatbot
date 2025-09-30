@@ -19,7 +19,7 @@ def load_components():
 
 embedding_model, index, qa_lookup = load_components()
 configure(api_key=st.secrets["GEMINI_API_KEY"])
-gemini_model = GenerativeModel("gemini-1.5-flash-002")
+gemini_model = GenerativeModel("gemini-2.5-flash")
 
 # Retrieval
 def retrieve_similar_qa(query, index, lookup, embedding_model, top_k=5):
