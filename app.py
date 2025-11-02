@@ -3,7 +3,7 @@ import faiss
 import json
 from sentence_transformers import SentenceTransformer
 # Import the types for configuration
-import openai
+from openai import OpenAI
 from google.generativeai import GenerativeModel, configure
 from google.generativeai.types import HarmCategory, HarmBlockThreshold 
 
@@ -94,6 +94,13 @@ except KeyError as e:
 
 # Initialize the Gemini Model (GPT will be initialized per-call for simplicity)
 gemini_model = GenerativeModel("gemini-2.5-flash")
+# Initialize the OpenAI Client
+try:
+    openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+except KeyError:
+    # Fallback in case the key is missing in secrets
+    st.warning("OPENAI_API_KEY not found in secrets. GPT-3.5 Turbo will not be available.")
+    openai_client = None
 # --- Retrieval Function (Modified) ---
 # (No changes needed in this function)
 def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5):
@@ -143,10 +150,8 @@ def query_llm(query, results, selected_persona, selected_llm_name):
         context += f"Q: {res['question']}\n"
         context += f"A: {res['answer']}\n"
 
-    # Construct the full prompt
-    full_prompt = f"""
-{system_prompt}
-
+    # Construct the full prompt (user's query + retrieved context)
+    user_content = f"""
 User Question: {query}
 
 CONTEXT to synthesize your answer from:
@@ -158,23 +163,26 @@ Answer:
     # --- Model Selection Logic ---
     try:
         if selected_llm_name == "Gemini 2.5 Flash":
-            # Call Gemini API with safety settings
+            # Call Gemini API with safety settings (No change needed here)
             response = gemini_model.generate_content(
-                full_prompt,
+                f"{system_prompt}\n{user_content}", # Combine system prompt and user content for Gemini
                 safety_settings=SAFETY_SETTINGS 
             )
             return response.text.strip()
             
         elif selected_llm_name == "GPT-3.5 Turbo":
-            # Call OpenAI Chat API
-            openai_response = openai.ChatCompletion.create(
+            # --- 🚨 FIX APPLIED HERE 🚨 ---
+            if not openai_client:
+                 return "Error: OpenAI client is not initialized. Check your API key."
+                 
+            openai_response = openai_client.chat.completions.create( # Use the new method
                 model=MODEL_MAPPING[selected_llm_name],
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": full_prompt}
+                    {"role": "user", "content": user_content}
                 ]
-                # NOTE: You would need to check for safety features specific to the OpenAI API
             )
+            # Access response content using the new structure
             return openai_response.choices[0].message.content.strip()
             
         else:
@@ -182,10 +190,10 @@ Answer:
             
     except Exception as e:
         # Handle API errors and Safety Blocks
-        if "blocked" in str(e).lower():
-             return "I'm sorry, I cannot answer that question. My programming prevents me from generating responses to requests that promote illegal, harmful, or unethical activities."
+        error_message = str(e).lower()
+        if "blocked" in error_message or "rate limit" in error_message or "invalid api key" in error_message:
+             return f"I'm sorry, I cannot process that request due to an API restriction or safety policy. Details: {error_message}"
         return f"[Error querying {selected_llm_name}]: {e}"
-
 # --- User Interface (Modified) ---
 
 # UI for Persona and Model Selection
