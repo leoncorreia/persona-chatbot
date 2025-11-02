@@ -83,12 +83,21 @@ def load_components():
 embedding_model, index, qa_lookup = load_components()
 
 # Ensure the API key is configured
+# Ensure the API keys are configured
 try:
-    # Google/Gemini Key
+    # 1. Configure the Gemini client
     configure(api_key=st.secrets["GEMINI_API_KEY"])
-    # OpenAI/GPT Key (Store this in secrets.toml as well)
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
+    
+    # 2. Check for OpenAI key before initializing the client (Crucial step)
+    if "OPENAI_API_KEY" in st.secrets:
+        # Initialize the OpenAI Client
+        openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    else:
+        st.warning("OPENAI_API_KEY not found in secrets. GPT-3.5 Turbo will not be available.")
+        openai_client = None
+
 except KeyError as e:
+    # Handles if GEMINI_API_KEY is missing
     st.error(f"Please ensure you have set all required API keys in your Streamlit secrets. Missing key: {e}")
     st.stop()
 
