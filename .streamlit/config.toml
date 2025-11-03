@@ -1,0 +1,22 @@
+[theme]
+# Base theme to inherit from (use 'dark' for this color scheme)
+base = "dark"
+
+# Primary accent color (a vibrant, electric blue for buttons/links)
+primaryColor = "#008AFF" 
+
+# Background color for the main app area (deep dark blue/gray)
+backgroundColor = "#1A2238" 
+
+# Background color for the sidebar and containers (a slightly lighter dark blue)
+secondaryBackgroundColor = "#212D45"
+
+# Main text color (a clean white)
+textColor = "#FFFFFF"
+
+# Font choice
+font = "sans serif"
+
+# Optional: Set sidebar background to match secondary background for consistency
+[theme.sidebar]
+backgroundColor = "#212D45"

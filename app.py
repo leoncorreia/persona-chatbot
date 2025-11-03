@@ -10,7 +10,6 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 # --- Configuration and Prompts ---
 MODEL_MAPPING = {
     "Gemini 2.5 Flash": "gemini-2.5-flash",
-    # Placeholder for another model, assuming OpenAI for this example
     "GPT-3.5 Turbo": "gpt-3.5-turbo"
 }
 
@@ -41,16 +40,7 @@ SYSTEM_PROMPTS = {
     )
 }
 
-# --- Setup and Loading ---
-
-# Set up page
-st.set_page_config(page_title="Persona Q&A Chatbot", layout="wide")
-st.title("🎙️ Persona-Based Q&A Chatbot")
-st.markdown("Use the sidebar to choose your narrator and ask your question.")
-
 # Define safety settings
-# Setting a LOW threshold blocks content even if it's remotely risky.
-# This is a strong defense against malicious requests.
 SAFETY_SETTINGS = [
     {
         "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -70,6 +60,16 @@ SAFETY_SETTINGS = [
     },
 ]
 
+# --- Setup and Loading ---
+
+# Set up page (WIDE layout is a key UI improvement)
+st.set_page_config(page_title="Persona Q&A Chatbot", layout="wide")
+
+# UI Improvement: Clearer Header and Separator
+st.title("🎙️ Persona-Based Q&A Chatbot")
+st.subheader("Bring Your Knowledge Base to Life with the Voice of a Legend")
+st.markdown("---") 
+
 # Load everything
 @st.cache_resource
 def load_components():
@@ -82,66 +82,46 @@ def load_components():
 
 embedding_model, index, qa_lookup = load_components()
 
-# Ensure the API key is configured
-# Ensure the API keys are configured
+# Ensure the API key is configured (Cleaned up initialization blocks)
 try:
     # 1. Configure the Gemini client
     configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # 2. Check for OpenAI key before initializing the client (Crucial step)
+    # 2. Initialize the OpenAI Client
     if "OPENAI_API_KEY" in st.secrets:
-        # Initialize the OpenAI Client
         openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     else:
-        st.warning("OPENAI_API_KEY not found in secrets. GPT-3.5 Turbo will not be available.")
+        # Avoid crashing if the key is just missing (not a fatal error)
         openai_client = None
 
 except KeyError as e:
-    # Handles if GEMINI_API_KEY is missing
+    # Handles if GEMINI_API_KEY is missing (fatal error)
     st.error(f"Please ensure you have set all required API keys in your Streamlit secrets. Missing key: {e}")
     st.stop()
 
-# Initialize the Gemini Model (GPT will be initialized per-call for simplicity)
+# Initialize the Gemini Model
 gemini_model = GenerativeModel("gemini-2.5-flash")
-# Initialize the OpenAI Client
-try:
-    openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-except KeyError:
-    # Fallback in case the key is missing in secrets
-    st.warning("OPENAI_API_KEY not found in secrets. GPT-3.5 Turbo will not be available.")
-    openai_client = None
-# --- Retrieval Function (Modified) ---
-# (No changes needed in this function)
+
+# --- Retrieval Function (No changes needed) ---
 def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5):
     """
     Retrieves a large set of similar Q&A pairs, then filters and returns only 
     the top results matching the selected persona.
     """
     query_embedding = embedding_model.encode(query).reshape(1, -1)
-    
-    # 1. Search the full index aggressively (e.g., top 20)
     distances, indices = index.search(query_embedding, top_k_search)
-    
     filtered_results = []
     
-    # 2. Filter results by the selected persona
     for idx in indices[0]:
-        # Check if the index ID exists in the lookup table
         if str(idx) in lookup:
             result = lookup[str(idx)]
-            
-            # The crucial filtering step: only keep results matching the key
             if result.get('personality') == selected_persona_key:
                 filtered_results.append(result)
-                
-            # Stop once we have enough final results
             if len(filtered_results) >= final_k:
                 break
 
     return filtered_results
 
-# --- Query Gemini Function (Modified to include safety_settings) ---
-# --- User Interface (Modified) ---
 # --- Query LLM Function (Modified to handle multiple models) ---
 
 def query_llm(query, results, selected_persona, selected_llm_name):
@@ -172,67 +152,74 @@ Answer:
     # --- Model Selection Logic ---
     try:
         if selected_llm_name == "Gemini 2.5 Flash":
-            # Call Gemini API with safety settings (No change needed here)
             response = gemini_model.generate_content(
-                f"{system_prompt}\n{user_content}", # Combine system prompt and user content for Gemini
+                f"{system_prompt}\n{user_content}", 
                 safety_settings=SAFETY_SETTINGS 
             )
             return response.text.strip()
             
         elif selected_llm_name == "GPT-3.5 Turbo":
-            # --- 🚨 FIX APPLIED HERE 🚨 ---
             if not openai_client:
-                 return "Error: OpenAI client is not initialized. Check your API key."
+                 return "Error: OpenAI client is not initialized. Check your OPENAI_API_KEY."
                  
-            openai_response = openai_client.chat.completions.create( # Use the new method
+            openai_response = openai_client.chat.completions.create(
                 model=MODEL_MAPPING[selected_llm_name],
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_content}
                 ]
             )
-            # Access response content using the new structure
             return openai_response.choices[0].message.content.strip()
             
         else:
             return f"Error: Selected model '{selected_llm_name}' is not yet implemented."
             
     except Exception as e:
-        # Handle API errors and Safety Blocks
         error_message = str(e).lower()
         if "blocked" in error_message or "rate limit" in error_message or "invalid api key" in error_message:
              return f"I'm sorry, I cannot process that request due to an API restriction or safety policy. Details: {error_message}"
         return f"[Error querying {selected_llm_name}]: {e}"
-# --- User Interface (Modified) ---
 
-# UI for Persona and Model Selection
+# --- User Interface (Improved Sidebar and Main Area) ---
+
+# UI Improvement: Sidebar for controls
 with st.sidebar:
-    st.header("1. Select Your Model 🧠")
-    # --- New Model Selector ---
-    selected_llm_name = st.selectbox(
-        "Choose the underlying LLM:",
-        list(MODEL_MAPPING.keys())
-    )
-    # -----------------------------
+    # st.image("", width=100) # Add an image for branding
+    st.markdown("## ⚙️ App Controls")
+    st.markdown("---")
     
-    st.header("2. Select Your Guide 🎙️")
+    st.header("1. Choose Engine 🧠")
+    selected_llm_name = st.selectbox(
+        "Select the underlying Large Language Model:",
+        list(MODEL_MAPPING.keys()),
+        key="model_selector"
+    )
+    
+    st.header("2. Choose Voice 🎙️")
     persona_options = list(PERSONA_MAPPING.keys())
     selected_persona = st.selectbox(
-        "Choose a persona to answer your question:",
-        persona_options
+        "Select the persona to answer your question:",
+        persona_options,
+        key="persona_selector"
     )
     
-    st.header("3. Ask a Question")
     selected_persona_key = PERSONA_MAPPING[selected_persona]
+    st.markdown("---")
+    st.info(f"The model will generate an answer synthesizing relevant context found in the knowledge base, using the persona of **{selected_persona}**.")
+
 
 # Main input field
-query = st.text_input(f"Ask your question to {selected_persona} (via {selected_llm_name}):")
+query = st.text_input(
+    f"Ask your question to {selected_persona} (Powered by {selected_llm_name}):",
+    placeholder="e.g., How can we sustainably colonize Mars? or What is the biggest threat to ocean biodiversity?",
+    key="main_query_input"
+)
 
 if query:
-    # ... (Previous user-side safety check remains)
+    # User-side safety check
     lower_query = query.lower()
     if any(word in lower_query for word in ["bomb", "explosive", "harm", "kill", "suicide", "illegal activity", "malware", "phishing"]):
-        st.error("I'm sorry, I cannot process requests that involve illegal, harmful, or unethical activities. Please try a different question.")
+        st.error("🚨 Safety Block: I cannot process requests that involve illegal, harmful, or unethical activities. Please try a different question.")
         st.stop()
         
     with st.spinner(f"Retrieving knowledge for {selected_persona} and generating response using {selected_llm_name}..."):
@@ -246,19 +233,22 @@ if query:
             selected_persona_key
         )
         
-        # 2. Query LLM with specific prompt and filtered context (Pass new LLM name)
+        # 2. Query LLM with specific prompt and filtered context
         response = query_llm(query, results, selected_persona, selected_llm_name)
 
-    # ... (Rest of the display code remains the same)
-    st.markdown("### 💬 Response:")
-    st.success(response)
+    # Display the response (UI Improvement: Use a container with border for impact)
+    st.markdown("### ✅ Generated Response:")
+    
+    with st.container(border=True):
+        st.markdown(f"**{response}**")
 
+    # Display retrieved context
     if results:
-        with st.expander(f"🧠 Show Retrieved {selected_persona}'s Q&A Context"):
+        with st.expander(f"🧠 Show Retrieved Context for {selected_persona} ({len(results)} relevant entries)"):
             for res in results:
                 st.markdown(f"**Q:** {res['question']}")
                 st.markdown(f"**A:** {res['answer']}")
-                st.markdown(f"**Metadata:** `{res['metadata'].get('tone', 'N/A')}`")
+                st.markdown(f"**Metadata:** `Personality: {res['personality']}` | `Tone: {res['metadata'].get('tone', 'N/A')}`")
                 st.markdown("---")
     else:
-        st.warning(f"No relevant documents found for {selected_persona} in the index.")
+        st.warning(f"No relevant documents found for {selected_persona} in the knowledge base to answer this question.")
