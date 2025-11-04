@@ -15,8 +15,13 @@ from elevenlabs import ElevenLabs
 
 # 1. Model Mapping
 MODEL_MAPPING = {
-    "Gemini 2.5 Flash": "gemini-2.5-flash",
-    "GPT-3.5 Turbo": "gpt-3.5-turbo"
+    "Gemini 2.5 Flash": {"provider": "google", "model": "gemini-2.5-flash"},
+    "Gemini 2.0 Flash": {"provider": "google", "model": "gemini-2.0-flash-exp"},
+    "GPT-4o Mini": {"provider": "openai", "model": "gpt-4o-mini"},
+    "GPT-3.5 Turbo": {"provider": "openai", "model": "gpt-3.5-turbo"},
+    "Llama 3.1 8B (Groq)": {"provider": "groq", "model": "llama-3.1-8b-instant"},
+    "Llama 3.3 70B (Groq)": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
+    "Mixtral 8x7B (Groq)": {"provider": "groq", "model": "mixtral-8x7b-32768"},
 }
 
 # 2. Persona Mapping
@@ -26,11 +31,20 @@ PERSONA_MAPPING = {
     "Morgan Freeman": "morgan_freeman"
 }
 
-# 3. ElevenLabs TTS Configuration
+# 3. TTS Configuration
 TTS_TARGET_PERSONA = "David Attenborough" 
+
+# OpenAI TTS Voice Mapping
+OPENAI_VOICE_MAPPING = {
+    "Elon Musk": "onyx",
+    "David Attenborough": "onyx",
+    "Morgan Freeman": "onyx"
+}
+
+# ElevenLabs Voice ID (backup)
 VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
 
-# 4. System Prompts (Crucial for voice imitation)
+# 4. System Prompts
 SYSTEM_PROMPTS = {
     "elon": (
         "You are Elon Musk. Respond to the user's question using the provided context. "
@@ -80,10 +94,12 @@ embedding_model, index, qa_lookup = load_components()
 # --- API KEY & CLIENT INITIALIZATION ---
 
 # Initialize availability flags and clients
-elevenlabs_available = False
+tts_available = False
+tts_provider = None
 openai_client = None
 elevenlabs_client = None
 gemini_model = None
+groq_client = None
 
 try:
     # 1. Configure the Gemini client
@@ -91,20 +107,32 @@ try:
         configure(api_key=st.secrets["GEMINI_API_KEY"])
         gemini_model = GenerativeModel("gemini-2.5-flash")
     
-    # 2. Initialize the OpenAI Client
+    # 2. Initialize the OpenAI Client (also handles TTS)
     if "OPENAI_API_KEY" in st.secrets:
         openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+        tts_available = True
+        tts_provider = "openai"
+    
+    # 3. Initialize Groq Client (FREE and FAST!)
+    if "GROQ_API_KEY" in st.secrets:
+        try:
+            from groq import Groq
+            groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+        except ImportError:
+            st.sidebar.warning("💡 Install 'groq' package: pip install groq")
         
-    # 3. Initialize the ElevenLabs Client (FIXED)
+    # 4. Initialize ElevenLabs Client (backup TTS)
     if "ELEVENLABS_API_KEY" in st.secrets:
-        elevenlabs_client = ElevenLabs(api_key=st.secrets["ELEVENLABS_API_KEY"])
-        elevenlabs_available = True
+        try:
+            elevenlabs_client = ElevenLabs(api_key=st.secrets["ELEVENLABS_API_KEY"])
+            if not tts_available:
+                tts_available = True
+                tts_provider = "elevenlabs"
+        except Exception as el_error:
+            pass  # Silent fail for ElevenLabs
 
 except Exception as e:
     st.warning(f"Error during API setup: {e}")
-    if gemini_model is None:
-        st.error("GEMINI_API_KEY is required. Please set it in your Streamlit secrets.")
-        st.stop()
 
 # --- RETRIEVAL FUNCTION ---
 
@@ -123,7 +151,38 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
                 break
     return filtered_results
 
-# --- QUERY LLM FUNCTION (FIXED TTS Call) ---
+# --- TTS GENERATION FUNCTION ---
+
+def generate_speech(text, selected_persona):
+    """Generate speech using available TTS provider"""
+    try:
+        if tts_provider == "openai" and openai_client:
+            response = openai_client.audio.speech.create(
+                model="tts-1",
+                voice=OPENAI_VOICE_MAPPING.get(selected_persona, "onyx"),
+                input=text
+            )
+            audio_stream = io.BytesIO(response.content)
+            audio_stream.seek(0)
+            return audio_stream
+            
+        elif tts_provider == "elevenlabs" and elevenlabs_client:
+            audio_generator = elevenlabs_client.text_to_speech.convert(
+                voice_id=VOICE_ID_NARRATOR,
+                text=text
+            )
+            audio_bytes = b"".join(audio_generator)
+            audio_stream = io.BytesIO(audio_bytes)
+            audio_stream.seek(0)
+            return audio_stream
+            
+    except Exception as tts_e:
+        st.warning(f"TTS generation failed: {tts_e}")
+        return None
+    
+    return None
+
+# --- QUERY LLM FUNCTION ---
 
 def query_llm(query, results, selected_persona, selected_llm_name):
     
@@ -152,7 +211,12 @@ Answer:
     audio_file_path = None
 
     try:
-        if selected_llm_name == "Gemini 2.5 Flash":
+        model_info = MODEL_MAPPING[selected_llm_name]
+        provider = model_info["provider"]
+        model_name = model_info["model"]
+        
+        # Route to appropriate provider
+        if provider == "google":
             if not gemini_model:
                 return ("Error: Gemini model is not initialized. Check your GEMINI_API_KEY.", None)
             response = gemini_model.generate_content(
@@ -161,12 +225,12 @@ Answer:
             )
             response_text = response.text.strip()
             
-        elif selected_llm_name == "GPT-3.5 Turbo":
+        elif provider == "openai":
             if not openai_client:
                 return ("Error: OpenAI client is not initialized. Check your OPENAI_API_KEY.", None)
                  
             openai_response = openai_client.chat.completions.create(
-                model=MODEL_MAPPING[selected_llm_name],
+                model=model_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_content}
@@ -174,30 +238,27 @@ Answer:
             )
             response_text = openai_response.choices[0].message.content.strip()
             
-        else:
-            return (f"Error: Selected model '{selected_llm_name}' is not yet implemented.", None)
-
-        
-        # --- TTS Generation Logic for David Attenborough (FIXED) ---
-        if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available and elevenlabs_client:
-            try:
-                # FIXED: Correct method call for ElevenLabs v1.x
-                audio_generator = elevenlabs_client.text_to_speech.convert(
-                    text=response_text,
-                    voice_id=VOICE_ID_NARRATOR,
-                    model_id="eleven_multilingual_v2"
-                )
-
-                # Collect all audio chunks
-                audio_bytes = b"".join(audio_generator)
-                
-                # Save audio to an in-memory byte stream 
-                audio_stream = io.BytesIO(audio_bytes)
-                audio_stream.seek(0)  # Reset pointer to beginning
-                audio_file_path = audio_stream 
+        elif provider == "groq":
+            if not groq_client:
+                return ("Error: Groq client is not initialized. Check your GROQ_API_KEY or install: pip install groq", None)
             
-            except Exception as tts_e:
-                st.warning(f"Could not generate voice for {selected_persona}. ElevenLabs API error: {tts_e}")
+            chat_completion = groq_client.chat.completions.create(
+                model=model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content}
+                ],
+                temperature=0.7,
+                max_tokens=1024
+            )
+            response_text = chat_completion.choices[0].message.content.strip()
+            
+        else:
+            return (f"Error: Provider '{provider}' is not yet implemented.", None)
+
+        # Generate TTS for David Attenborough
+        if selected_persona == TTS_TARGET_PERSONA and tts_available:
+            audio_file_path = generate_speech(response_text, selected_persona)
 
         return response_text, audio_file_path
         
@@ -210,7 +271,7 @@ Answer:
 
 # --- USER INTERFACE AND EXECUTION ---
 
-# UI Improvement: Sidebar for controls
+# Sidebar for controls
 with st.sidebar:
     st.markdown("## ⚙️ App Controls")
     st.markdown("---")
@@ -233,16 +294,17 @@ with st.sidebar:
     selected_persona_key = PERSONA_MAPPING[selected_persona]
     st.markdown("---")
     
-    # UI Improvement: Highlight TTS availability
-    if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available:
-        st.success(f"🎤 Voice synthesis enabled for **{selected_persona}**!")
-    elif selected_persona == TTS_TARGET_PERSONA and not elevenlabs_available:
-        st.warning(f"⚠️ ElevenLabs API key not found. Text-only mode for {selected_persona}.")
+    # Display TTS status
+    if selected_persona == TTS_TARGET_PERSONA:
+        if tts_available:
+            st.success(f"🎤 Voice enabled via **{tts_provider.upper()}**")
+        else:
+            st.warning("⚠️ Add OPENAI_API_KEY for voice synthesis")
     else:
-        st.info("Text-only response (voice synthesis only available for David Attenborough).")
+        st.info("🔇 Voice only available for David Attenborough")
 
 
-# Main input field (UI Improvement: Placeholder text)
+# Main input field
 query = st.text_input(
     f"Ask your question to {selected_persona} (Powered by {selected_llm_name}):",
     placeholder="e.g., What is the biggest threat to ocean biodiversity in the next decade?",
@@ -250,7 +312,7 @@ query = st.text_input(
 )
 
 if query:
-    # User-side safety check
+    # Safety check
     lower_query = query.lower()
     if any(word in lower_query for word in ["bomb", "explosive", "harm", "kill", "suicide", "illegal activity", "malware", "phishing"]):
         st.error("🚨 Safety Block: I cannot process requests that involve illegal, harmful, or unethical activities. Please try a different question.")
@@ -258,7 +320,7 @@ if query:
         
     with st.spinner(f"Retrieving knowledge for {selected_persona} and generating response using {selected_llm_name}..."):
         
-        # 1. Retrieve and Filter based on persona
+        # 1. Retrieve and filter based on persona
         results = retrieve_similar_qa(
             query, 
             index, 
@@ -267,20 +329,20 @@ if query:
             selected_persona_key
         )
         
-        # 2. Query LLM and get both text and audio path
+        # 2. Query LLM and get both text and audio
         response_text, audio_path = query_llm(query, results, selected_persona, selected_llm_name)
 
     # --- Display Response ---
     st.markdown("### ✅ Generated Response:")
     
-    # Display the audio player first if available
+    # Display audio player if available
     if audio_path:
         st.audio(audio_path, format="audio/mp3")
     else:
-        if selected_persona == TTS_TARGET_PERSONA and not elevenlabs_available:
-            st.info("💡 Add ELEVENLABS_API_KEY to your secrets to enable voice synthesis!")
+        if selected_persona == TTS_TARGET_PERSONA and not tts_available:
+            st.info("💡 Add OPENAI_API_KEY to enable voice synthesis!")
     
-    # Display the text response (UI Improvement: Use a container with border)
+    # Display text response
     with st.container(border=True):
         st.markdown(f"**{response_text}**")
 
