@@ -185,7 +185,7 @@ Answer:
                 audio_generator = elevenlabs_client.text_to_speech.convert(
                     text=response_text,
                     voice_id=VOICE_ID_NARRATOR,
-                    model="eleven_multilingual_v2"
+                    model_id="eleven_multilingual_v2"
                 )
 
                 # Collect all audio chunks
