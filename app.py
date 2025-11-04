@@ -18,7 +18,7 @@ MODEL_MAPPING = {
     "Gemini 2.5 Flash": {"provider": "google", "model": "gemini-2.5-flash"},
     #"Gemini 2.0 Flash": {"provider": "google", "model": "gemini-2.0-flash-exp"},
     "GPT-4.0": {"provider": "openai", "model": "gpt-4o-mini"},
-    "Mistral": {"provider": "openai", "model": "gpt-3.5-turbo"},
+    #"Mistral": {"provider": "openai", "model": "gpt-3.5-turbo"},
     "Llama 3.1 8B ": {"provider": "groq", "model": "llama-3.1-8b-instant"},
     "Phi-3 ": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
     "Claude ": {"provider": "groq", "model": "mixtral-8x7b-32768"},
