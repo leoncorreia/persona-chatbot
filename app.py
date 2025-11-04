@@ -9,7 +9,9 @@ from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from google.generativeai import GenerativeModel, configure
 from google.generativeai.types import HarmCategory, HarmBlockThreshold 
-from elevenlabs import generate, set_api_key, voices
+# CORRECTED: Use client class for initialization and its method for generation
+from elevenlabs.client import ElevenLabs 
+from elevenlabs import play, stream 
 
 # --- CONFIGURATION ---
 
@@ -27,9 +29,8 @@ PERSONA_MAPPING = {
 }
 
 # 3. ElevenLabs TTS Configuration
-# Note: David Attenborough's voice often requires custom cloning on ElevenLabs
 TTS_TARGET_PERSONA = "David Attenborough" 
-# !!! REPLACE WITH YOUR CHOSEN VOICE ID FROM ELEVENLABS !!!
+# Confirmed Voice ID: JBFqnCBsd6RMkjVDRZzb
 VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
 
 # 4. System Prompts (Crucial for voice imitation)
@@ -62,7 +63,6 @@ SAFETY_SETTINGS = [
 
 # --- UI SETUP ---
 
-# Set up page (UI Improvement: WIDE layout and title)
 st.set_page_config(page_title="Persona Q&A Chatbot", layout="wide")
 st.title("🎙️ Persona-Based Q&A Chatbot")
 st.subheader("Bring Your Knowledge Base to Life with the Voice of a Legend")
@@ -72,7 +72,6 @@ st.markdown("---")
 
 @st.cache_resource
 def load_components():
-    # Load embedding model, FAISS index, and Q&A lookup table
     model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
     index = faiss.read_index("qa_index.faiss")
     with open("qa_lookup.json", "r", encoding="utf-8") as f:
@@ -83,9 +82,10 @@ embedding_model, index, qa_lookup = load_components()
 
 # --- API KEY & CLIENT INITIALIZATION ---
 
-# Initialize availability flags
+# Initialize availability flags and clients
 elevenlabs_available = False
 openai_client = None
+elevenlabs_client = None # NEW: Initialize ElevenLabs client variable
 
 try:
     # 1. Configure the Gemini client
@@ -96,9 +96,9 @@ try:
     if "OPENAI_API_KEY" in st.secrets:
         openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
         
-    # 3. Initialize the ElevenLabs Client
+    # 3. Initialize the ElevenLabs Client (CORRECTED SYNTAX)
     if "ELEVENLABS_API_KEY" in st.secrets:
-        set_api_key(st.secrets["ELEVENLABS_API_KEY"])
+        elevenlabs_client = ElevenLabs(api_key=st.secrets["ELEVENLABS_API_KEY"])
         elevenlabs_available = True
 
 except KeyError as e:
@@ -106,7 +106,8 @@ except KeyError as e:
     st.error(f"Please ensure you have set all required API keys in your Streamlit secrets. Missing key: {e}")
     st.stop()
 except Exception as e:
-    st.warning(f"Error during optional API setup (OpenAI/ElevenLabs): {e}")
+    # Captures errors if the ElevenLabs or OpenAI keys were present but invalid
+    st.warning(f"Error during optional API setup (OpenAI/ElevenLabs client creation): {e}")
 
 # --- RETRIEVAL FUNCTION ---
 
@@ -125,7 +126,7 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
                 break
     return filtered_results
 
-# --- QUERY LLM FUNCTION (Updated for TTS) ---
+# --- QUERY LLM FUNCTION (CORRECTED TTS Call) ---
 
 def query_llm(query, results, selected_persona, selected_llm_name):
     
@@ -177,21 +178,22 @@ Answer:
         else:
             return (f"Error: Selected model '{selected_llm_name}' is not yet implemented.", None)
 
-        # --- TTS Generation Logic for David Attenborough ---
-        if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available and VOICE_ID_NARRATOR != "VOICE_ID_NARRATOR":
+        # --- TTS Generation Logic for David Attenborough (CORRECTED CALL) ---
+        if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available:
             try:
-                # Generate the audio stream
-                audio = generate(
+                # CORRECTED: Call generate method on the initialized client object
+                audio = elevenlabs_client.generate( 
                     text=response_text,
                     voice=VOICE_ID_NARRATOR,
                     model="eleven_multilingual_v2"
                 )
-                # Save audio to an in-memory byte stream (cleaner than file)
+                
+                # Save audio to an in-memory byte stream 
                 audio_stream = io.BytesIO(audio)
                 audio_file_path = audio_stream 
                     
             except Exception as tts_e:
-                st.warning(f"Could not generate voice for {selected_persona}: {tts_e}")
+                st.warning(f"Could not generate voice for {selected_persona}. ElevenLabs API error: {tts_e}")
                 
         return response_text, audio_file_path
 
