@@ -184,7 +184,7 @@ Answer:
                 # FIXED: Correct method call for ElevenLabs v1.x
                 audio_generator = elevenlabs_client.text_to_speech.convert(
                     text=response_text,
-                    voice=VOICE_ID_NARRATOR,
+                    voice_id=VOICE_ID_NARRATOR,
                     model="eleven_multilingual_v2"
                 )
 
