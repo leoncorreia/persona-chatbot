@@ -178,25 +178,25 @@ Answer:
         else:
             return (f"Error: Selected model '{selected_llm_name}' is not yet implemented.", None)
 
-        # --- TTS Generation Logic for David Attenborough (CORRECTED CALL) ---
+        
+        # --- TTS Generation Logic for David Attenborough (FINAL CORRECTED CALL) ---
         if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available:
             try:
-                # CORRECTED: Call generate method on the initialized client object
-                audio = elevenlabs_client.generate( 
+                # FINAL CORRECTION: Use the fully qualified text_to_speech method
+                audio = elevenlabs_client.text_to_speech.convert( 
+                    voice_id=VOICE_ID_NARRATOR, # Use voice_id argument
                     text=response_text,
-                    voice=VOICE_ID_NARRATOR,
-                    model="eleven_multilingual_v2"
+                    model_id="eleven_multilingual_v2" # Use model_id argument
                 )
-                
+        
                 # Save audio to an in-memory byte stream 
                 audio_stream = io.BytesIO(audio)
                 audio_file_path = audio_stream 
-                    
+            
             except Exception as tts_e:
                 st.warning(f"Could not generate voice for {selected_persona}. ElevenLabs API error: {tts_e}")
-                
-        return response_text, audio_file_path
 
+        return response_text, audio_file_path
     except Exception as e:
         error_message = str(e).lower()
         if "blocked" in error_message or "rate limit" in error_message or "invalid api key" in error_message:
