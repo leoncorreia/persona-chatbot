@@ -9,9 +9,7 @@ from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from google.generativeai import GenerativeModel, configure
 from google.generativeai.types import HarmCategory, HarmBlockThreshold 
-# CORRECTED: Use client class for initialization and its method for generation
-from elevenlabs.client import ElevenLabs 
-from elevenlabs import play, stream 
+from elevenlabs import ElevenLabs
 
 # --- CONFIGURATION ---
 
@@ -30,7 +28,6 @@ PERSONA_MAPPING = {
 
 # 3. ElevenLabs TTS Configuration
 TTS_TARGET_PERSONA = "David Attenborough" 
-# Confirmed Voice ID: JBFqnCBsd6RMkjVDRZzb
 VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
 
 # 4. System Prompts (Crucial for voice imitation)
@@ -85,29 +82,29 @@ embedding_model, index, qa_lookup = load_components()
 # Initialize availability flags and clients
 elevenlabs_available = False
 openai_client = None
-elevenlabs_client = None # NEW: Initialize ElevenLabs client variable
+elevenlabs_client = None
+gemini_model = None
 
 try:
     # 1. Configure the Gemini client
-    configure(api_key=st.secrets["GEMINI_API_KEY"])
-    gemini_model = GenerativeModel("gemini-2.5-flash")
+    if "GEMINI_API_KEY" in st.secrets:
+        configure(api_key=st.secrets["GEMINI_API_KEY"])
+        gemini_model = GenerativeModel("gemini-2.5-flash")
     
     # 2. Initialize the OpenAI Client
     if "OPENAI_API_KEY" in st.secrets:
         openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
         
-    # 3. Initialize the ElevenLabs Client (CORRECTED SYNTAX)
+    # 3. Initialize the ElevenLabs Client (FIXED)
     if "ELEVENLABS_API_KEY" in st.secrets:
         elevenlabs_client = ElevenLabs(api_key=st.secrets["ELEVENLABS_API_KEY"])
         elevenlabs_available = True
 
-except KeyError as e:
-    # Handles if the essential GEMINI_API_KEY is missing
-    st.error(f"Please ensure you have set all required API keys in your Streamlit secrets. Missing key: {e}")
-    st.stop()
 except Exception as e:
-    # Captures errors if the ElevenLabs or OpenAI keys were present but invalid
-    st.warning(f"Error during optional API setup (OpenAI/ElevenLabs client creation): {e}")
+    st.warning(f"Error during API setup: {e}")
+    if gemini_model is None:
+        st.error("GEMINI_API_KEY is required. Please set it in your Streamlit secrets.")
+        st.stop()
 
 # --- RETRIEVAL FUNCTION ---
 
@@ -126,7 +123,7 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
                 break
     return filtered_results
 
-# --- QUERY LLM FUNCTION (CORRECTED TTS Call) ---
+# --- QUERY LLM FUNCTION (FIXED TTS Call) ---
 
 def query_llm(query, results, selected_persona, selected_llm_name):
     
@@ -156,6 +153,8 @@ Answer:
 
     try:
         if selected_llm_name == "Gemini 2.5 Flash":
+            if not gemini_model:
+                return ("Error: Gemini model is not initialized. Check your GEMINI_API_KEY.", None)
             response = gemini_model.generate_content(
                 f"{system_prompt}\n{user_content}", 
                 safety_settings=SAFETY_SETTINGS 
@@ -164,7 +163,7 @@ Answer:
             
         elif selected_llm_name == "GPT-3.5 Turbo":
             if not openai_client:
-                 return ("Error: OpenAI client is not initialized. Check your OPENAI_API_KEY.", None)
+                return ("Error: OpenAI client is not initialized. Check your OPENAI_API_KEY.", None)
                  
             openai_response = openai_client.chat.completions.create(
                 model=MODEL_MAPPING[selected_llm_name],
@@ -179,29 +178,33 @@ Answer:
             return (f"Error: Selected model '{selected_llm_name}' is not yet implemented.", None)
 
         
-        # --- TTS Generation Logic for David Attenborough (FINAL CORRECTED CALL) ---
-        if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available:
+        # --- TTS Generation Logic for David Attenborough (FIXED) ---
+        if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available and elevenlabs_client:
             try:
-                # FINAL CORRECTION: Use the fully qualified text_to_speech method
-                audio_generator = elevenlabs_client.text_to_speech.convert( 
-                    voice_id=VOICE_ID_NARRATOR, # Use voice_id argument
+                # FIXED: Correct method call for ElevenLabs v1.x
+                audio_generator = elevenlabs_client.generate(
                     text=response_text,
-                    model_id="eleven_multilingual_v2" # Use model_id argument
+                    voice=VOICE_ID_NARRATOR,
+                    model="eleven_multilingual_v2"
                 )
 
-                audio_bytes=b"".join(audio_generator)        
+                # Collect all audio chunks
+                audio_bytes = b"".join(audio_generator)
+                
                 # Save audio to an in-memory byte stream 
                 audio_stream = io.BytesIO(audio_bytes)
+                audio_stream.seek(0)  # Reset pointer to beginning
                 audio_file_path = audio_stream 
             
             except Exception as tts_e:
                 st.warning(f"Could not generate voice for {selected_persona}. ElevenLabs API error: {tts_e}")
 
         return response_text, audio_file_path
+        
     except Exception as e:
         error_message = str(e).lower()
         if "blocked" in error_message or "rate limit" in error_message or "invalid api key" in error_message:
-             return (f"I'm sorry, I cannot process that request due to an API restriction or safety policy. Details: {error_message}", None)
+            return (f"I'm sorry, I cannot process that request due to an API restriction or safety policy. Details: {error_message}", None)
         return (f"[Error querying {selected_llm_name}]: {e}", None)
 
 
@@ -232,9 +235,11 @@ with st.sidebar:
     
     # UI Improvement: Highlight TTS availability
     if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available:
-        st.info(f"🎤 Voice synthesis enabled for **{selected_persona}**!")
+        st.success(f"🎤 Voice synthesis enabled for **{selected_persona}**!")
+    elif selected_persona == TTS_TARGET_PERSONA and not elevenlabs_available:
+        st.warning(f"⚠️ ElevenLabs API key not found. Text-only mode for {selected_persona}.")
     else:
-        st.info("The model synthesizes an answer using retrieved context.")
+        st.info("Text-only response (voice synthesis only available for David Attenborough).")
 
 
 # Main input field (UI Improvement: Placeholder text)
@@ -271,6 +276,9 @@ if query:
     # Display the audio player first if available
     if audio_path:
         st.audio(audio_path, format="audio/mp3")
+    else:
+        if selected_persona == TTS_TARGET_PERSONA and not elevenlabs_available:
+            st.info("💡 Add ELEVENLABS_API_KEY to your secrets to enable voice synthesis!")
     
     # Display the text response (UI Improvement: Use a container with border)
     with st.container(border=True):
