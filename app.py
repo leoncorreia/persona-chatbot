@@ -107,11 +107,9 @@ try:
         configure(api_key=st.secrets["GEMINI_API_KEY"])
         gemini_model = GenerativeModel("gemini-2.5-flash")
     
-    # 2. Initialize the OpenAI Client (also handles TTS)
+    # 2. Initialize the OpenAI Client (for GPT models)
     if "OPENAI_API_KEY" in st.secrets:
         openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        tts_available = True
-        tts_provider = "openai"
     
     # 3. Initialize Groq Client (FREE and FAST!)
     if "GROQ_API_KEY" in st.secrets:
@@ -121,15 +119,19 @@ try:
         except ImportError:
             st.sidebar.warning("💡 Install 'groq' package: pip install groq")
         
-    # 4. Initialize ElevenLabs Client (backup TTS)
+    # 4. Initialize ElevenLabs Client (PRIMARY TTS)
     if "ELEVENLABS_API_KEY" in st.secrets:
         try:
             elevenlabs_client = ElevenLabs(api_key=st.secrets["ELEVENLABS_API_KEY"])
-            if not tts_available:
-                tts_available = True
-                tts_provider = "elevenlabs"
+            tts_available = True
+            tts_provider = "elevenlabs"
         except Exception as el_error:
-            pass  # Silent fail for ElevenLabs
+            st.sidebar.warning(f"⚠️ ElevenLabs initialization failed: {el_error}")
+    
+    # 5. Fallback to OpenAI TTS if ElevenLabs not available
+    if not tts_available and openai_client:
+        tts_available = True
+        tts_provider = "openai"
 
 except Exception as e:
     st.warning(f"Error during API setup: {e}")
@@ -156,17 +158,8 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
 def generate_speech(text, selected_persona):
     """Generate speech using available TTS provider"""
     try:
-        if tts_provider == "openai" and openai_client:
-            response = openai_client.audio.speech.create(
-                model="tts-1",
-                voice=OPENAI_VOICE_MAPPING.get(selected_persona, "onyx"),
-                input=text
-            )
-            audio_stream = io.BytesIO(response.content)
-            audio_stream.seek(0)
-            return audio_stream
-            
-        elif tts_provider == "elevenlabs" and elevenlabs_client:
+        if tts_provider == "elevenlabs" and elevenlabs_client:
+            # ElevenLabs TTS - PRIMARY
             audio_generator = elevenlabs_client.text_to_speech.convert(
                 voice_id=VOICE_ID_NARRATOR,
                 text=text
@@ -176,8 +169,23 @@ def generate_speech(text, selected_persona):
             audio_stream.seek(0)
             return audio_stream
             
+        elif tts_provider == "openai" and openai_client:
+            # OpenAI TTS - FALLBACK
+            response = openai_client.audio.speech.create(
+                model="tts-1",
+                voice=OPENAI_VOICE_MAPPING.get(selected_persona, "onyx"),
+                input=text
+            )
+            audio_stream = io.BytesIO(response.content)
+            audio_stream.seek(0)
+            return audio_stream
+            
     except Exception as tts_e:
-        st.warning(f"TTS generation failed: {tts_e}")
+        error_msg = str(tts_e)
+        if "401" in error_msg or "unusual_activity" in error_msg:
+            st.info("ℹ️ ElevenLabs Free Tier limit reached. Consider upgrading your plan or the app will try OpenAI as fallback.")
+        else:
+            st.warning(f"TTS generation failed: {tts_e}")
         return None
     
     return None
