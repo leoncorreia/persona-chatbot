@@ -183,14 +183,15 @@ Answer:
         if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available:
             try:
                 # FINAL CORRECTION: Use the fully qualified text_to_speech method
-                audio = elevenlabs_client.text_to_speech.convert( 
+                audio_generator = elevenlabs_client.text_to_speech.convert( 
                     voice_id=VOICE_ID_NARRATOR, # Use voice_id argument
                     text=response_text,
                     model_id="eleven_multilingual_v2" # Use model_id argument
                 )
-        
+
+                audio_bytes=b"".join(audio_generator)        
                 # Save audio to an in-memory byte stream 
-                audio_stream = io.BytesIO(audio)
+                audio_stream = io.BytesIO(audio_bytes)
                 audio_file_path = audio_stream 
             
             except Exception as tts_e:
