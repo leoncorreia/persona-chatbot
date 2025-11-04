@@ -182,7 +182,7 @@ Answer:
         if selected_persona == TTS_TARGET_PERSONA and elevenlabs_available and elevenlabs_client:
             try:
                 # FIXED: Correct method call for ElevenLabs v1.x
-                audio_generator = elevenlabs_client.generate(
+                audio_generator = elevenlabs_client.text_to_speech.convert(
                     text=response_text,
                     voice=VOICE_ID_NARRATOR,
                     model="eleven_multilingual_v2"
