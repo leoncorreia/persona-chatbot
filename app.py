@@ -17,11 +17,11 @@ from elevenlabs import ElevenLabs
 MODEL_MAPPING = {
     "Gemini 2.5 Flash": {"provider": "google", "model": "gemini-2.5-flash"},
     "Gemini 2.0 Flash": {"provider": "google", "model": "gemini-2.0-flash-exp"},
-    "GPT-4o Mini": {"provider": "openai", "model": "gpt-4o-mini"},
-    "GPT-3.5 Turbo": {"provider": "openai", "model": "gpt-3.5-turbo"},
-    "Llama 3.1 8B (Groq)": {"provider": "groq", "model": "llama-3.1-8b-instant"},
-    "Llama 3.3 70B (Groq)": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
-    "Mixtral 8x7B (Groq)": {"provider": "groq", "model": "mixtral-8x7b-32768"},
+    "Phi-3": {"provider": "openai", "model": "gpt-4o-mini"},
+    "Claude": {"provider": "openai", "model": "gpt-3.5-turbo"},
+    "Llama 3.1 8B ": {"provider": "groq", "model": "llama-3.1-8b-instant"},
+    "Llama 3.3 70B ": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
+    "Mixtral 8x7B ": {"provider": "groq", "model": "mixtral-8x7b-32768"},
 }
 
 # 2. Persona Mapping
