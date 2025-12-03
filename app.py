@@ -29,7 +29,6 @@ PERSONA_MAPPING = {
     "Morgan Freeman": "morgan_freeman"
 }
 
-# Updated with Avatars and Colors for the new UI
 PERSONA_INFO = {
     "Elon Musk": {
         "emoji": "🚀", 
@@ -76,38 +75,25 @@ SYSTEM_PROMPTS = {
 
 SAFETY_SETTINGS = [
     {"category": HarmCategory.HARM_CATEGORY_HARASSMENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
-    {"category": HarmCategory.HARM_CATEGORY_HATE_SPEECH, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
-    {"category": HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
-    {"category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
 ]
 
-# --- PAGE SETUP ---
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="Persona Q&A", page_icon="🎭", layout="wide")
 
-st.set_page_config(
-    page_title="Persona Q&A Chatbot",
-    page_icon="🎭",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# --- CSS STYLING (ChatGPT / Gemini Style) ---
+# --- CSS STYLING ---
 st.markdown("""
 <style>
-    /* 1. FORCE WHITE THEME & REMOVE PADDING */
+    /* FORCE WHITE THEME & REMOVE PADDING */
     .stApp { background-color: #ffffff; color: #333333; }
-    
-    /* Clean up the top bar */
     .block-container { 
         padding-top: 1.5rem !important; 
-        padding-bottom: 8rem !important; /* Space for fixed chat input */
-        max-width: 55rem !important; /* Center the content like ChatGPT */
+        padding-bottom: 8rem !important; 
+        max-width: 55rem !important; 
     }
-    
-    /* Hide Default Header/Footer */
     header { visibility: hidden; } 
     footer { visibility: hidden; }
 
-    /* 2. CHAT INPUT STYLING (Floating Bottom) */
+    /* CHAT INPUT STYLING */
     .stChatInput {
         position: fixed;
         bottom: 2rem;
@@ -119,14 +105,14 @@ st.markdown("""
         padding-inline: 1rem;
     }
     
-    /* 3. DROPDOWN STYLING (Gemini Style Pill) */
+    /* DROPDOWN STYLING */
     div[data-testid="stSelectbox"] {
         border: none;
         background-color: transparent;
         width: 200px;
     }
     div[data-testid="stSelectbox"] > div > div {
-        background-color: #f0f2f6; /* Light grey pill */
+        background-color: #f0f2f6; 
         border: none;
         border-radius: 8px;
         color: #333;
@@ -134,12 +120,7 @@ st.markdown("""
         min-height: 2.5rem;
     }
     
-    /* 4. PERSONA BUTTONS (Centered Hero) */
-    .persona-btn-container {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-    }
+    /* PERSONA BUTTONS */
     .stButton > button {
         border-radius: 12px;
         border: 1px solid #e5e5e5;
@@ -158,20 +139,16 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
     }
     
-    /* 5. MESSAGE BUBBLES */
+    /* MESSAGE BUBBLES */
     .stChatMessage { background-color: transparent; border: none; }
-    div[data-testid="stChatMessageContent"] {
-        background-color: transparent;
-        padding-left: 0;
-    }
+    div[data-testid="stChatMessageContent"] { background-color: transparent; padding-left: 0; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BACKEND LOGIC (Restored from Original) ---
+# --- BACKEND LOGIC ---
 
 @st.cache_resource
 def load_components():
-    # Attempt to load, create dummy if missing to prevent crash
     try:
         model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
         if os.path.exists("qa_index.faiss"):
@@ -179,17 +156,15 @@ def load_components():
             with open("qa_lookup.json", "r", encoding="utf-8") as f:
                 lookup = json.load(f)
         else:
-            # Fallback for first run without data
             index = faiss.IndexFlatL2(384)
             lookup = {}
         return model, index, lookup
     except Exception as e:
-        st.error(f"Error loading components: {e}")
         return None, None, None
 
 embedding_model, index, qa_lookup = load_components()
 
-# API Clients Initialization
+# API Setup
 tts_available = False
 tts_provider = None
 openai_client = None
@@ -201,8 +176,7 @@ def get_api_key(key_name):
     try:
         if hasattr(st, 'secrets') and key_name in st.secrets:
             return st.secrets[key_name]
-    except:
-        pass
+    except: pass
     return os.getenv(key_name)
 
 try:
@@ -212,8 +186,7 @@ try:
         gemini_model = GenerativeModel("gemini-2.5-flash")
     
     openai_key = get_api_key("OPENAI_API_KEY")
-    if openai_key:
-        openai_client = OpenAI(api_key=openai_key)
+    if openai_key: openai_client = OpenAI(api_key=openai_key)
     
     groq_key = get_api_key("GROQ_API_KEY")
     if groq_key:
@@ -229,65 +202,33 @@ try:
     if not tts_available and openai_client:
         tts_available = True
         tts_provider = "openai"
+except: pass
 
-except Exception as e:
-    st.error(f"⚠️ Error during API setup: {e}")
+# --- CORE FUNCTIONS ---
 
-# --- HELPER FUNCTIONS ---
-
-# def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5):
-#     if index is None or index.ntotal == 0: return []
-#     query_embedding = embedding_model.encode(query).reshape(1, -1)
-#     distances, indices = index.search(query_embedding, top_k_search)
-#     filtered_results = []
-    
-#     for idx in indices[0]:
-#         if str(idx) in lookup:
-#             result = lookup[str(idx)]
-#             if result.get('personality') == selected_persona_key:
-#                 filtered_results.append(result)
-#             if len(filtered_results) >= final_k:
-#                 break
-#     return filtered_results
-# --- UPDATED RETRIEVAL FUNCTION ---
-
-def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5, threshold=1.2):
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5, threshold=1.3):
     """
-    Retrieves Q&A pairs. 
-    New feature: 'threshold'. If the distance is > 1.2, the match is considered irrelevant 
-    and we skip it, triggering the web search fallback in the main loop.
+    Retrieve context with a THRESHOLD filter. 
+    If distance > 1.3, we ignore it to allow Web Search fallback.
     """
-    if index is None or index.ntotal == 0: 
-        return []
-        
+    if index is None or index.ntotal == 0: return []
     query_embedding = embedding_model.encode(query).reshape(1, -1)
-    
-    # search returns (distances, indices)
     distances, indices = index.search(query_embedding, top_k_search)
-    
     filtered_results = []
     
-    # Zip distances and indices together so we can check relevance
     for dist, idx in zip(distances[0], indices[0]):
-        # DISTANCE CHECK: Lower is better. 
-        # If dist > threshold (e.g. 1.2), it's too different. Skip it.
-        if dist > threshold:
-            continue
-            
+        if dist > threshold: continue  # Skip bad matches
         if str(idx) in lookup:
             result = lookup[str(idx)]
-            # Check if this piece of knowledge belongs to the selected persona
             if result.get('personality') == selected_persona_key:
                 filtered_results.append(result)
-            
-            if len(filtered_results) >= final_k:
-                break
-                
+            if len(filtered_results) >= final_k: break
     return filtered_results
+
 def search_web(query, max_results=3):
     try:
         search_url = f"https://html.duckduckgo.com/html/?q={query}"
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        headers = {'User-Agent': 'Mozilla/5.0'}
         response = requests.get(search_url, headers=headers, timeout=5)
         soup = BeautifulSoup(response.text, 'html.parser')
         results = []
@@ -297,24 +238,17 @@ def search_web(query, max_results=3):
             if title_elem and snippet_elem:
                 results.append({'title': title_elem.get_text(strip=True), 'snippet': snippet_elem.get_text(strip=True)})
         return results
-    except Exception as e:
-        return []
+    except: return []
 
 def generate_speech(text, selected_persona):
     try:
         if tts_provider == "elevenlabs" and elevenlabs_client:
-            audio_generator = elevenlabs_client.text_to_speech.convert(
-                voice_id=VOICE_ID_NARRATOR, text=text
-            )
-            return io.BytesIO(b"".join(audio_generator))
+            gen = elevenlabs_client.text_to_speech.convert(voice_id=VOICE_ID_NARRATOR, text=text)
+            return io.BytesIO(b"".join(gen))
         elif tts_provider == "openai" and openai_client:
-            response = openai_client.audio.speech.create(
-                model="tts-1", voice=OPENAI_VOICE_MAPPING.get(selected_persona, "onyx"), input=text
-            )
-            return io.BytesIO(response.content)
-    except Exception:
-        return None
-    return None
+            res = openai_client.audio.speech.create(model="tts-1", voice=OPENAI_VOICE_MAPPING.get(selected_persona, "onyx"), input=text)
+            return io.BytesIO(res.content)
+    except: return None
 
 def query_llm(query, results, selected_persona, selected_llm_name, use_web_search=False):
     persona_key = PERSONA_MAPPING[selected_persona]
@@ -326,7 +260,7 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
         context_source = "knowledge base"
         for i, res in enumerate(results, 1):
             context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
-    elif use_web_search or not results:
+    elif use_web_search:
         context_source = "web search"
         web_results = search_web(query)
         if web_results:
@@ -334,10 +268,9 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
             for i, web_res in enumerate(web_results, 1):
                 context += f"\nSource {i}: {web_res['title']}\n{web_res['snippet']}\n"
         else:
-            return (f"I am {selected_persona}, and I couldn't find information about '{query}'.", None)
+            return (f"I am {selected_persona}, and I couldn't find info about '{query}' anywhere.", None)
 
     user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nAnswer in your style."
-    
     response_text = ""
     audio_file_path = None
     
@@ -350,175 +283,81 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
             response = gemini_model.generate_content(f"{system_prompt}\n{user_content}", safety_settings=SAFETY_SETTINGS)
             response_text = response.text.strip()
         elif provider == "openai" and openai_client:
-            res = openai_client.chat.completions.create(
-                model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]
-            )
+            res = openai_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}])
             response_text = res.choices[0].message.content.strip()
         elif provider == "groq" and groq_client:
-            res = groq_client.chat.completions.create(
-                model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]
-            )
+            res = groq_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}])
             response_text = res.choices[0].message.content.strip()
             
         if selected_persona == TTS_TARGET_PERSONA and tts_available:
             audio_file_path = generate_speech(response_text, selected_persona)
             
         return response_text, audio_file_path
-        
-    except Exception as e:
-        return (f"Error: {e}", None)
+    except Exception as e: return (f"Error: {e}", None)
 
 # --- UI IMPLEMENTATION ---
 
-# Initialize Session State
 if 'selected_persona' not in st.session_state: st.session_state.selected_persona = "David Attenborough"
 if 'selected_model' not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
 if 'messages' not in st.session_state: st.session_state.messages = []
 
-# 1. HEADER ROW (Model Select + Persona Indicator)
+# HEADER
 col_head1, col_head2 = st.columns([1, 3])
-
 with col_head1:
-    # Gemini-style Dropdown
-    st.session_state.selected_model = st.selectbox(
-        "Select Model",
-        list(MODEL_MAPPING.keys()),
-        index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model),
-        label_visibility="collapsed"
-    )
-
+    st.session_state.selected_model = st.selectbox("Select Model", list(MODEL_MAPPING.keys()), index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model), label_visibility="collapsed")
 with col_head2:
-    # Subtle persona indicator
     curr_persona = st.session_state.selected_persona
     info = PERSONA_INFO[curr_persona]
-    st.markdown(f"""
-    <div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">
-        Talking to <b>{curr_persona}</b> {info['emoji']}
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"""<div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">Talking to <b>{curr_persona}</b> {info['emoji']}</div>""", unsafe_allow_html=True)
 
 st.divider()
 
-# 2. MAIN CONTENT LOGIC
-
-# CHECK: Is Chat Empty?
+# MAIN VIEW
 if not st.session_state.messages:
-    # === HERO SCREEN (ChatGPT Style) ===
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown(f"<h1 style='text-align: center; color: #1f2937;'>How can {st.session_state.selected_persona} help?</h1>", unsafe_allow_html=True)
     st.markdown(f"<p style='text-align: center; color: #6b7280; margin-bottom: 3rem;'>{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>", unsafe_allow_html=True)
     
-    # Persona Selection Grid
     c1, c2, c3 = st.columns(3)
-    
     for idx, (name, p_info) in enumerate(PERSONA_INFO.items()):
-        col = [c1, c2, c3][idx]
-        with col:
-            # We use a button that updates state and reruns
+        with [c1, c2, c3][idx]:
             if st.button(f"{p_info['emoji']} {name}", key=f"hero_{name}", use_container_width=True):
                 st.session_state.selected_persona = name
                 st.rerun()
-
 else:
-    # === CHAT HISTORY SCREEN ===
     for msg in st.session_state.messages:
         avatar = "👤" if msg["role"] == "user" else PERSONA_INFO[st.session_state.selected_persona]["avatar"]
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
-            if "audio" in msg and msg["audio"]:
-                st.audio(msg["audio"], format="audio/mp3")
+            if "audio" in msg and msg["audio"]: st.audio(msg["audio"], format="audio/mp3")
 
-# 3. CHAT INPUT (Fixed Bottom)
+# INPUT & LOGIC
 if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
-    
-    # Add User Message to State
     st.session_state.messages.append({"role": "user", "content": query})
-    
-    # Force rerun so the UI switches from "Hero" to "Chat" view immediately
     st.rerun()
 
-# 4. GENERATE RESPONSE (Logic triggers after rerun)
-# if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
-    
-#     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
-#         with st.spinner("Thinking..."):
-            
-#             # --- BACKEND INTEGRATION HERE ---
-#             last_query = st.session_state.messages[-1]["content"]
-            
-#             # 1. Retrieval
-#             retrieved = retrieve_similar_qa(
-#                 last_query, index, qa_lookup, embedding_model, 
-#                 PERSONA_MAPPING[st.session_state.selected_persona]
-#             )
-            
-#             # 2. Web Search Flag
-#             use_web = len(retrieved) == 0
-            
-#             # 3. LLM Query
-#             resp_text, audio_data = query_llm(
-#                 last_query, retrieved, 
-#                 st.session_state.selected_persona, 
-#                 st.session_state.selected_model, 
-#                 use_web_search=use_web
-#             )
-            
-#             # 4. Display
-#             st.markdown(resp_text)
-#             if audio_data:
-#                 st.audio(audio_data, format="audio/mp3")
-            
-#             # 5. Save to History
-#             msg_data = {"role": "assistant", "content": resp_text}
-#             if audio_data:
-#                 msg_data["audio"] = audio_data
-#             st.session_state.messages.append(msg_data)
-# 4. GENERATE RESPONSE (Logic triggers after rerun)
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
-    
     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
-        
-        # We use st.status to show the user what's happening behind the scenes
-        with st.status("🧠 Processing request...", expanded=True) as status:
-            
-            # --- BACKEND INTEGRATION HERE ---
+        # VISUAL STATUS INDICATOR
+        with st.status("🧠 Processing...", expanded=True) as status:
             last_query = st.session_state.messages[-1]["content"]
             
-            # 1. Retrieval (Database)
+            # 1. RETRIEVE & FILTER
             status.write("🔍 Checking knowledge base...")
-            retrieved = retrieve_similar_qa(
-                last_query, index, qa_lookup, embedding_model, 
-                PERSONA_MAPPING[st.session_state.selected_persona]
-            )
+            retrieved = retrieve_similar_qa(last_query, index, qa_lookup, embedding_model, PERSONA_MAPPING[st.session_state.selected_persona])
             
-            # 2. Web Search Fallback
-            # If retrieved list is empty (because of our new Threshold), use_web becomes True
+            # 2. DECIDE SOURCE
             use_web = len(retrieved) == 0
+            if use_web: status.write("🌐 Memory irrelevant. Searching Web...")
+            else: status.write(f"📚 Found {len(retrieved)} relevant memories.")
             
-            if use_web:
-                status.write("🌐 Knowledge base empty or irrelevant. Searching the web...")
-                # Optional: You can customize the query here if needed, e.g., f"{last_query} recipe"
-            else:
-                status.write(f"📚 Found {len(retrieved)} relevant memories.")
-
-            # 3. LLM Query
-            status.write(f"🤖 Generating response as {st.session_state.selected_persona}...")
-            resp_text, audio_data = query_llm(
-                last_query, retrieved, 
-                st.session_state.selected_persona, 
-                st.session_state.selected_model, 
-                use_web_search=use_web
-            )
+            # 3. GENERATE
+            resp_text, audio_data = query_llm(last_query, retrieved, st.session_state.selected_persona, st.session_state.selected_model, use_web_search=use_web)
+            status.update(label="✅ Answer Ready", state="complete", expanded=False)
             
-            status.update(label="✅ Response Generated", state="complete", expanded=False)
-            
-        # 4. Display Response
         st.markdown(resp_text)
-        if audio_data:
-            st.audio(audio_data, format="audio/mp3")
+        if audio_data: st.audio(audio_data, format="audio/mp3")
         
-        # 5. Save to History
         msg_data = {"role": "assistant", "content": resp_text}
-        if audio_data:
-            msg_data["audio"] = audio_data
+        if audio_data: msg_data["audio"] = audio_data
         st.session_state.messages.append(msg_data)
