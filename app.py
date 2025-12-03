@@ -226,19 +226,36 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
     return filtered_results
 
 def search_web(query, max_results=3):
+    """
+    Improved search with better headers to avoid being blocked.
+    """
     try:
+        # Using a backend API approach often works better than raw HTML scraping
+        # But sticking to simple requests, we need 'User-Agent' to look like a real browser
         search_url = f"https://html.duckduckgo.com/html/?q={query}"
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(search_url, headers=headers, timeout=5)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(search_url, headers=headers, timeout=10)
+        
+        # Check if we actually got a valid page
+        if response.status_code != 200:
+            return []
+            
         soup = BeautifulSoup(response.text, 'html.parser')
         results = []
         for result in soup.find_all('div', class_='result')[:max_results]:
             title_elem = result.find('a', class_='result__a')
             snippet_elem = result.find('a', class_='result__snippet')
             if title_elem and snippet_elem:
-                results.append({'title': title_elem.get_text(strip=True), 'snippet': snippet_elem.get_text(strip=True)})
+                results.append({
+                    'title': title_elem.get_text(strip=True), 
+                    'snippet': snippet_elem.get_text(strip=True)
+                })
         return results
-    except: return []
+    except Exception as e:
+        print(f"Search Error: {e}") # Debugging
+        return []
 
 def generate_speech(text, selected_persona):
     try:
@@ -251,26 +268,38 @@ def generate_speech(text, selected_persona):
     except: return None
 
 def query_llm(query, results, selected_persona, selected_llm_name, use_web_search=False):
+    """
+    Updated to use GENERAL KNOWLEDGE if Search/Memory fails.
+    """
     persona_key = PERSONA_MAPPING[selected_persona]
     system_prompt = SYSTEM_PROMPTS[persona_key]
     context = ""
-    context_source = ""
+    context_source = "general knowledge" # Default to general knowledge
     
+    # 1. Try Knowledge Base
     if results:
         context_source = "knowledge base"
         for i, res in enumerate(results, 1):
             context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
+            
+    # 2. Try Web Search (only if KB failed)
     elif use_web_search:
-        context_source = "web search"
         web_results = search_web(query)
         if web_results:
-            context += "\n-- Web Search --\n"
+            context_source = "web search"
+            context += "\n-- Web Search Results --\n"
             for i, web_res in enumerate(web_results, 1):
                 context += f"\nSource {i}: {web_res['title']}\n{web_res['snippet']}\n"
         else:
-            return (f"I am {selected_persona}, and I couldn't find info about '{query}' anywhere.", None)
+            # === CRITICAL FIX ===
+            # If web search fails (returns []), DO NOT RETURN ERROR.
+            # Instead, leave context empty and let the LLM use its own brain.
+            context_source = "general knowledge (fallback)"
+            context += "\n[Note: No external context found. Answer based on your internal training data.]\n"
 
-    user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nAnswer in your style."
+    # Construct Prompt
+    user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nAnswer in your persona style."
+    
     response_text = ""
     audio_file_path = None
     
@@ -279,21 +308,42 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
         provider = model_info["provider"]
         model_name = model_info["model"]
         
+        # --- MODEL CALLS ---
         if provider == "google" and gemini_model:
-            response = gemini_model.generate_content(f"{system_prompt}\n{user_content}", safety_settings=SAFETY_SETTINGS)
+            response = gemini_model.generate_content(
+                f"{system_prompt}\n{user_content}", 
+                safety_settings=SAFETY_SETTINGS
+            )
             response_text = response.text.strip()
+            
         elif provider == "openai" and openai_client:
-            res = openai_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}])
-            response_text = res.choices[0].message.content.strip()
-        elif provider == "groq" and groq_client:
-            res = groq_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}])
+            res = openai_client.chat.completions.create(
+                model=model_name, 
+                messages=[
+                    {"role": "system", "content": system_prompt}, 
+                    {"role": "user", "content": user_content}
+                ]
+            )
             response_text = res.choices[0].message.content.strip()
             
+        elif provider == "groq" and groq_client:
+            res = groq_client.chat.completions.create(
+                model=model_name, 
+                messages=[
+                    {"role": "system", "content": system_prompt}, 
+                    {"role": "user", "content": user_content}
+                ]
+            )
+            response_text = res.choices[0].message.content.strip()
+            
+        # --- TTS ---
         if selected_persona == TTS_TARGET_PERSONA and tts_available:
             audio_file_path = generate_speech(response_text, selected_persona)
             
         return response_text, audio_file_path
-    except Exception as e: return (f"Error: {e}", None)
+        
+    except Exception as e:
+        return (f"Error generating response: {e}", None)
 
 # --- UI IMPLEMENTATION ---
 
