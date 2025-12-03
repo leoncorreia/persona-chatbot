@@ -463,16 +463,58 @@ st.set_page_config(
     page_title="Persona Q&A Chatbot",
     page_icon="🎭",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Custom CSS for better styling
 st.markdown("""
     <style>
-    /* Main container styling */
+    /* Hide sidebar by default */
+    [data-testid="stSidebar"] {
+        display: none;
+    }
+    
+    /* Main container styling with custom purple theme */
     .main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
         padding: 2rem;
+    }
+    
+    /* Primary color override */
+    :root {
+        --primary-color: #8B5CF6;
+        --background-color: #F9FAFB;
+        --secondary-background-color: #FFFFFF;
+        --text-color: #1F2937;
+    }
+    
+    /* Button styling with purple theme */
+    .stButton>button {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3);
+        background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    }
+    
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        background-color: white;
+        border: 2px solid #E5E7EB;
+        border-radius: 8px;
+    }
+    
+    .stSelectbox > div > div:focus-within {
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
     }
     
     /* Card-like containers */
@@ -496,15 +538,6 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Persona card styling */
-    .persona-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        border-left: 5px solid #667eea;
-    }
-    
     /* Response container */
     .response-box {
         background: #f8fafc;
@@ -512,31 +545,6 @@ st.markdown("""
         border-radius: 8px;
         padding: 1.5rem;
         margin: 1rem 0;
-    }
-    
-    /* Sidebar styling */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
-    }
-    
-    [data-testid="stSidebar"] * {
-        color: white !important;
-    }
-    
-    /* Button styling */
-    .stButton>button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
     
     /* Input field styling */
@@ -548,8 +556,8 @@ st.markdown("""
     }
     
     .stTextInput>div>div>input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
     }
     
     /* Expander styling */
@@ -557,12 +565,71 @@ st.markdown("""
         background: #f1f5f9;
         border-radius: 8px;
         font-weight: 600;
+        color: #1F2937;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: #E0E7FF;
+        color: #8B5CF6;
     }
     
     /* Audio player styling */
     audio {
         width: 100%;
         margin: 1rem 0;
+    }
+    
+    /* Control panel card */
+    .control-panel {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        border: 2px solid #E5E7EB;
+    }
+    
+    /* Status badge styling */
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 0.25rem;
+    }
+    
+    .status-success {
+        background: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-error {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+    
+    /* Persona button styling */
+    .persona-btn {
+        background: white;
+        border: 2px solid #E5E7EB;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .persona-btn:hover {
+        border-color: #8B5CF6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+    
+    .persona-btn.selected {
+        border-color: #8B5CF6;
+        background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -848,122 +915,159 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar for controls
-with st.sidebar:
-    st.markdown("### ⚙️ Configuration")
-    
-    # API Status Display
-    st.markdown("#### 🔑 API Status")
-    col1, col2 = st.columns(2)
+# Initialize session state
+if 'selected_persona' not in st.session_state:
+    st.session_state.selected_persona = "David Attenborough"
+if 'selected_model' not in st.session_state:
+    st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
+if 'show_settings' not in st.session_state:
+    st.session_state.show_settings = False
+
+# Control Panel in main area
+with st.container():
+    col1, col2, col3 = st.columns([2, 2, 1])
     
     with col1:
-        if gemini_model:
-            st.success("✅ Gemini", icon="🤖")
-        else:
-            st.error("❌ Gemini", icon="🤖")
-        
-        if openai_client:
-            st.success("✅ OpenAI", icon="🔑")
-        else:
-            st.error("❌ OpenAI", icon="🔑")
+        st.markdown("### 🎙️ Choose Persona")
     
     with col2:
-        if groq_client:
-            st.success("✅ Groq", icon="⚡")
-        else:
-            st.error("❌ Groq", icon="⚡")
+        st.markdown("### 🧠 AI Model")
+    
+    with col3:
+        if st.button("⚙️ Settings", use_container_width=True):
+            st.session_state.show_settings = not st.session_state.show_settings
+
+# Settings Expander (replaces sidebar)
+if st.session_state.show_settings:
+    with st.expander("⚙️ Configuration & API Status", expanded=True):
+        st.markdown("#### 🔑 API Connection Status")
         
-        if tts_available:
-            st.success(f"✅ TTS", icon="🎤")
-        else:
-            st.error("❌ TTS", icon="🎤")
-    
-    if not (gemini_model or openai_client or groq_client):
-        st.warning("⚠️ Configure API keys to continue")
-        with st.expander("📝 How to add API keys"):
-            st.markdown("""
-            **Option 1: Streamlit Secrets**
-            Create `.streamlit/secrets.toml`:
-            ```toml
-            GEMINI_API_KEY = "your-key-here"
-            OPENAI_API_KEY = "your-key-here"
-            GROQ_API_KEY = "your-key-here"
-            ```
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            if gemini_model:
+                st.markdown('<div class="status-badge status-success">✅ Gemini Active</div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="status-badge status-error">❌ Gemini Inactive</div>', unsafe_allow_html=True)
+        
+        with col2:
+            if openai_client:
+                st.markdown('<div class="status-badge status-success">✅ OpenAI Active</div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="status-badge status-error">❌ OpenAI Inactive</div>', unsafe_allow_html=True)
+        
+        with col3:
+            if groq_client:
+                st.markdown('<div class="status-badge status-success">✅ Groq Active</div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="status-badge status-error">❌ Groq Inactive</div>', unsafe_allow_html=True)
+        
+        with col4:
+            if tts_available:
+                st.markdown(f'<div class="status-badge status-success">✅ TTS ({tts_provider})</div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="status-badge status-error">❌ TTS Inactive</div>', unsafe_allow_html=True)
+        
+        if not (gemini_model or openai_client or groq_client):
+            st.warning("⚠️ No API keys configured. Please add API keys to use the chatbot.")
             
-            **Option 2: Environment Variables**
-            ```bash
-            export GEMINI_API_KEY="your-key"
-            export OPENAI_API_KEY="your-key"
-            export GROQ_API_KEY="your-key"
-            ```
-            """)
-    
-    st.markdown("---")
-    
-    # Model Selection
-    st.markdown("#### 🧠 AI Engine")
-    selected_llm_name = st.selectbox(
-        "Choose your language model",
-        list(MODEL_MAPPING.keys()),
-        key="model_selector",
-        label_visibility="collapsed"
-    )
-    
-    st.markdown("---")
-    
-    # Persona Selection with visual cards
-    st.markdown("#### 🎙️ Voice Persona")
+            st.markdown("#### 📝 How to Configure API Keys")
+            
+            tab1, tab2 = st.tabs(["Streamlit Secrets", "Environment Variables"])
+            
+            with tab1:
+                st.markdown("""
+                Create `.streamlit/secrets.toml` in your project root:
+                ```toml
+                GEMINI_API_KEY = "your-gemini-api-key"
+                OPENAI_API_KEY = "your-openai-api-key"
+                GROQ_API_KEY = "your-groq-api-key"
+                ELEVENLABS_API_KEY = "your-elevenlabs-key"
+                ```
+                """)
+            
+            with tab2:
+                st.markdown("""
+                Set environment variables:
+                ```bash
+                export GEMINI_API_KEY="your-key"
+                export OPENAI_API_KEY="your-key"
+                export GROQ_API_KEY="your-key"
+                export ELEVENLABS_API_KEY="your-key"
+                ```
+                """)
+
+# Persona and Model Selection
+col1, col2, col3 = st.columns([2, 2, 1])
+
+with col1:
+    # Persona selection buttons
+    persona_cols = st.columns(3)
     persona_options = list(PERSONA_MAPPING.keys())
     
-    for persona in persona_options:
-        info = PERSONA_INFO[persona]
-        col1, col2 = st.columns([1, 4])
-        with col1:
-            if st.button(info["emoji"], key=f"btn_{persona}", use_container_width=True):
+    for idx, persona in enumerate(persona_options):
+        with persona_cols[idx]:
+            info = PERSONA_INFO[persona]
+            is_selected = st.session_state.selected_persona == persona
+            
+            button_class = "selected" if is_selected else ""
+            
+            if st.button(
+                f"{info['emoji']}\n\n**{persona}**",
+                key=f"persona_{persona}",
+                use_container_width=True,
+                type="primary" if is_selected else "secondary"
+            ):
                 st.session_state.selected_persona = persona
-        with col2:
-            st.markdown(f"**{persona}**")
-    
-    # Initialize session state
-    if 'selected_persona' not in st.session_state:
-        st.session_state.selected_persona = persona_options[0]
-    
+                st.rerun()
+
+with col2:
+    # Model selection dropdown
+    selected_llm_name = st.selectbox(
+        "Select AI Model",
+        list(MODEL_MAPPING.keys()),
+        index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model),
+        key="model_selector_main",
+        label_visibility="collapsed"
+    )
+    st.session_state.selected_model = selected_llm_name
+
+with col3:
+    # Voice indicator
     selected_persona = st.session_state.selected_persona
-    selected_persona_key = PERSONA_MAPPING[selected_persona]
-    
-    st.markdown("---")
-    
-    # Display persona info card
-    info = PERSONA_INFO[selected_persona]
-    st.markdown(f"""
-        <div style='background: linear-gradient(135deg, {info['color']}22 0%, {info['color']}44 100%); 
-                    padding: 1rem; border-radius: 10px; margin: 1rem 0;'>
-            <div style='font-size: 2rem; text-align: center;'>{info['emoji']}</div>
-            <div style='text-align: center; font-weight: 600; margin-top: 0.5rem;'>{selected_persona}</div>
-            <div style='text-align: center; font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;'>
-                {info['tagline']}
+    if selected_persona == TTS_TARGET_PERSONA and tts_available:
+        st.markdown(f"""
+            <div style='text-align: center; padding: 1rem; background: #D1FAE5; border-radius: 8px; margin-top: 0.5rem;'>
+                <div style='font-size: 1.5rem;'>🎤</div>
+                <div style='font-size: 0.8rem; color: #065F46; font-weight: 600;'>Voice Active</div>
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+            <div style='text-align: center; padding: 1rem; background: #F3F4F6; border-radius: 8px; margin-top: 0.5rem;'>
+                <div style='font-size: 1.5rem;'>🔇</div>
+                <div style='font-size: 0.8rem; color: #6B7280; font-weight: 600;'>Voice Off</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# Display selected persona info
+selected_persona_key = PERSONA_MAPPING[selected_persona]
+info = PERSONA_INFO[selected_persona]
+
+st.markdown(f"""
+    <div style='background: linear-gradient(135deg, {info['color']}15 0%, {info['color']}25 100%); 
+                padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; border-left: 4px solid {info['color']};'>
+        <div style='display: flex; align-items: center; gap: 1rem;'>
+            <div style='font-size: 3rem;'>{info['emoji']}</div>
+            <div>
+                <div style='font-size: 1.4rem; font-weight: 700; color: #1F2937; margin-bottom: 0.25rem;'>{selected_persona}</div>
+                <div style='color: #6B7280; font-style: italic;'>{info['tagline']}</div>
             </div>
         </div>
-    """, unsafe_allow_html=True)
-    
-    # TTS Status
-    st.markdown("---")
-    st.markdown("#### 🎤 Voice Synthesis")
-    if selected_persona == TTS_TARGET_PERSONA:
-        if tts_available:
-            st.success(f"Active: {tts_provider.upper()}")
-        else:
-            st.warning("Add API key for voice")
-    else:
-        st.info("Only for David Attenborough")
-    
-    # Footer
-    st.markdown("---")
-    st.markdown("""
-        <div style='text-align: center; font-size: 0.8rem; color: #94a3b8; margin-top: 2rem;'>
-            Powered by AI • Built with Streamlit
-        </div>
-    """, unsafe_allow_html=True)
+    </div>
+""", unsafe_allow_html=True)
+
+st.markdown("---")
 
 # Main content area
 col1, col2, col3 = st.columns([1, 6, 1])
