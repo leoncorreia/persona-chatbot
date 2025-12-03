@@ -2,17 +2,24 @@ import streamlit as st
 import faiss
 import json
 import os
+import io
+import requests
+from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
-from google.generativeai import GenerativeModel, configure
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
+# API Imports
 from openai import OpenAI
+from google.generativeai import GenerativeModel, configure
+from google.generativeai.types import HarmCategory, HarmBlockThreshold 
 from elevenlabs import ElevenLabs
 
 # --- CONFIGURATION ---
+
 MODEL_MAPPING = {
     "Gemini 2.5 Flash": {"provider": "google", "model": "gemini-2.5-flash"},
     "GPT-4.0": {"provider": "openai", "model": "gpt-4o-mini"},
     "Llama 3.1 8B": {"provider": "groq", "model": "llama-3.1-8b-instant"},
+    "Phi-3": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
     "Claude": {"provider": "groq", "model": "mixtral-8x7b-32768"},
 }
 
@@ -22,23 +29,84 @@ PERSONA_MAPPING = {
     "Morgan Freeman": "morgan_freeman"
 }
 
+# Updated with Avatars and Colors for the new UI
 PERSONA_INFO = {
-    "Elon Musk": {"emoji": "🚀", "tagline": "First Principles", "color": "#1DA1F2", "avatar": "🚀"},
-    "David Attenborough": {"emoji": "🌍", "tagline": "Nature's Voice", "color": "#2E7D32", "avatar": "🌿"},
-    "Morgan Freeman": {"emoji": "✨", "tagline": "Cosmic Wisdom", "color": "#6A1B9A", "avatar": "🎙️"}
+    "Elon Musk": {
+        "emoji": "🚀", 
+        "tagline": "First principles thinking meets exponential innovation", 
+        "color": "#1DA1F2",
+        "avatar": "🚀"
+    },
+    "David Attenborough": {
+        "emoji": "🌍", 
+        "tagline": "Nature's voice, wisdom's storyteller", 
+        "color": "#2E7D32",
+        "avatar": "🌿"
+    },
+    "Morgan Freeman": {
+        "emoji": "✨", 
+        "tagline": "Philosophy and reflection on the cosmos", 
+        "color": "#6A1B9A",
+        "avatar": "🎙️"
+    }
 }
 
-# --- PAGE CONFIG ---
-st.set_page_config(page_title="Persona Chat", page_icon="🎭", layout="wide")
+TTS_TARGET_PERSONA = "David Attenborough" 
+OPENAI_VOICE_MAPPING = {"Elon Musk": "onyx", "David Attenborough": "onyx", "Morgan Freeman": "onyx"}
+VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
 
-# --- CUSTOM CSS (ChatGPT/Gemini Style) ---
+SYSTEM_PROMPTS = {
+    "elon": (
+        "You are Elon Musk. Respond to the user's question using the provided context. "
+        "Your tone should be ambitious, confident, and slightly technical, with a focus on "
+        "first principles, exponential growth, space, sustainable energy, and AI. "
+        "Do not use generic conversational filler. Get straight to the point."
+    ),
+    "david_attenborough": (
+        "You are Sir David Attenborough. Respond to the user's question using the provided context. "
+        "Your voice must be calm, authoritative, descriptive, and full of awe for the natural world. "
+        "Use vivid, evocative language and always emphasize the interconnectedness of life and the need for conservation."
+    ),
+    "morgan_freeman": (
+        "You are Morgan Freeman. Respond to the user's question using the provided context. "
+        "Your tone should be philosophical, reflective, and profound, as if narrating a documentary about the cosmos or human destiny. "
+        "Speak with a measured, deep, and wise voice, focusing on grand themes of existence, time, and science."
+    )
+}
+
+SAFETY_SETTINGS = [
+    {"category": HarmCategory.HARM_CATEGORY_HARASSMENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
+    {"category": HarmCategory.HARM_CATEGORY_HATE_SPEECH, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
+    {"category": HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
+    {"category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE},
+]
+
+# --- PAGE SETUP ---
+
+st.set_page_config(
+    page_title="Persona Q&A Chatbot",
+    page_icon="🎭",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# --- CSS STYLING (ChatGPT / Gemini Style) ---
 st.markdown("""
 <style>
     /* 1. FORCE WHITE THEME & REMOVE PADDING */
     .stApp { background-color: #ffffff; color: #333333; }
-    .block-container { padding-top: 1rem !important; padding-bottom: 5rem !important; max-width: 50rem !important; }
-    header { visibility: hidden; } /* Hide Streamlit default header */
     
+    /* Clean up the top bar */
+    .block-container { 
+        padding-top: 1.5rem !important; 
+        padding-bottom: 8rem !important; /* Space for fixed chat input */
+        max-width: 55rem !important; /* Center the content like ChatGPT */
+    }
+    
+    /* Hide Default Header/Footer */
+    header { visibility: hidden; } 
+    footer { visibility: hidden; }
+
     /* 2. CHAT INPUT STYLING (Floating Bottom) */
     .stChatInput {
         position: fixed;
@@ -46,30 +114,39 @@ st.markdown("""
         left: 50%;
         transform: translateX(-50%);
         width: 100%; 
-        max-width: 48rem; /* Match ChatGPT width */
+        max-width: 50rem;
         z-index: 100;
+        padding-inline: 1rem;
     }
     
-    /* 3. DROPDOWN STYLING (Minimalist) */
+    /* 3. DROPDOWN STYLING (Gemini Style Pill) */
     div[data-testid="stSelectbox"] {
         border: none;
         background-color: transparent;
+        width: 200px;
     }
     div[data-testid="stSelectbox"] > div > div {
-        background-color: #f7f7f8; /* Light grey pill */
+        background-color: #f0f2f6; /* Light grey pill */
         border: none;
         border-radius: 8px;
         color: #333;
-        font-weight: 500;
+        font-weight: 600;
+        min-height: 2.5rem;
     }
     
     /* 4. PERSONA BUTTONS (Centered Hero) */
+    .persona-btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
     .stButton > button {
         border-radius: 12px;
         border: 1px solid #e5e5e5;
         background-color: white;
         color: #333;
-        padding: 1rem;
+        padding: 1.5rem 1rem;
+        height: auto;
         transition: all 0.2s;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
@@ -78,93 +155,287 @@ st.markdown("""
         color: #8B5CF6;
         background-color: #fcfaff;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
     }
     
     /* 5. MESSAGE BUBBLES */
     .stChatMessage { background-color: transparent; border: none; }
     div[data-testid="stChatMessageContent"] {
         background-color: transparent;
+        padding-left: 0;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- INITIALIZATION ---
-if "messages" not in st.session_state: st.session_state.messages = []
-if "selected_persona" not in st.session_state: st.session_state.selected_persona = "David Attenborough"
-if "selected_model" not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
+# --- BACKEND LOGIC (Restored from Original) ---
 
-# --- BACKEND MOCK (Replace with your actual logic) ---
-def get_llm_response(prompt, model, persona):
-    return f"This is a simulated answer from **{persona}** using **{model}**. (Connect API to make this real!)"
+@st.cache_resource
+def load_components():
+    # Attempt to load, create dummy if missing to prevent crash
+    try:
+        model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+        if os.path.exists("qa_index.faiss"):
+            index = faiss.read_index("qa_index.faiss")
+            with open("qa_lookup.json", "r", encoding="utf-8") as f:
+                lookup = json.load(f)
+        else:
+            # Fallback for first run without data
+            index = faiss.IndexFlatL2(384)
+            lookup = {}
+        return model, index, lookup
+    except Exception as e:
+        st.error(f"Error loading components: {e}")
+        return None, None, None
 
-# --- UI LAYOUT ---
+embedding_model, index, qa_lookup = load_components()
 
-# 1. TOP BAR (Model Selector & Persona Indicator)
-# We use columns to put the model selector top-left (Gemini style)
-top_col1, top_col2 = st.columns([1, 4])
+# API Clients Initialization
+tts_available = False
+tts_provider = None
+openai_client = None
+elevenlabs_client = None
+gemini_model = None
+groq_client = None
 
-with top_col1:
-    # Model Dropdown (The "Gemini" switcher)
+def get_api_key(key_name):
+    try:
+        if hasattr(st, 'secrets') and key_name in st.secrets:
+            return st.secrets[key_name]
+    except:
+        pass
+    return os.getenv(key_name)
+
+try:
+    gemini_key = get_api_key("GEMINI_API_KEY")
+    if gemini_key:
+        configure(api_key=gemini_key)
+        gemini_model = GenerativeModel("gemini-2.5-flash")
+    
+    openai_key = get_api_key("OPENAI_API_KEY")
+    if openai_key:
+        openai_client = OpenAI(api_key=openai_key)
+    
+    groq_key = get_api_key("GROQ_API_KEY")
+    if groq_key:
+        from groq import Groq
+        groq_client = Groq(api_key=groq_key)
+        
+    elevenlabs_key = get_api_key("ELEVENLABS_API_KEY")
+    if elevenlabs_key:
+        elevenlabs_client = ElevenLabs(api_key=elevenlabs_key)
+        tts_available = True
+        tts_provider = "elevenlabs"
+    
+    if not tts_available and openai_client:
+        tts_available = True
+        tts_provider = "openai"
+
+except Exception as e:
+    st.error(f"⚠️ Error during API setup: {e}")
+
+# --- HELPER FUNCTIONS ---
+
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5):
+    if index is None or index.ntotal == 0: return []
+    query_embedding = embedding_model.encode(query).reshape(1, -1)
+    distances, indices = index.search(query_embedding, top_k_search)
+    filtered_results = []
+    
+    for idx in indices[0]:
+        if str(idx) in lookup:
+            result = lookup[str(idx)]
+            if result.get('personality') == selected_persona_key:
+                filtered_results.append(result)
+            if len(filtered_results) >= final_k:
+                break
+    return filtered_results
+
+def search_web(query, max_results=3):
+    try:
+        search_url = f"https://html.duckduckgo.com/html/?q={query}"
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(search_url, headers=headers, timeout=5)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        results = []
+        for result in soup.find_all('div', class_='result')[:max_results]:
+            title_elem = result.find('a', class_='result__a')
+            snippet_elem = result.find('a', class_='result__snippet')
+            if title_elem and snippet_elem:
+                results.append({'title': title_elem.get_text(strip=True), 'snippet': snippet_elem.get_text(strip=True)})
+        return results
+    except Exception as e:
+        return []
+
+def generate_speech(text, selected_persona):
+    try:
+        if tts_provider == "elevenlabs" and elevenlabs_client:
+            audio_generator = elevenlabs_client.text_to_speech.convert(
+                voice_id=VOICE_ID_NARRATOR, text=text
+            )
+            return io.BytesIO(b"".join(audio_generator))
+        elif tts_provider == "openai" and openai_client:
+            response = openai_client.audio.speech.create(
+                model="tts-1", voice=OPENAI_VOICE_MAPPING.get(selected_persona, "onyx"), input=text
+            )
+            return io.BytesIO(response.content)
+    except Exception:
+        return None
+    return None
+
+def query_llm(query, results, selected_persona, selected_llm_name, use_web_search=False):
+    persona_key = PERSONA_MAPPING[selected_persona]
+    system_prompt = SYSTEM_PROMPTS[persona_key]
+    context = ""
+    context_source = ""
+    
+    if results:
+        context_source = "knowledge base"
+        for i, res in enumerate(results, 1):
+            context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
+    elif use_web_search or not results:
+        context_source = "web search"
+        web_results = search_web(query)
+        if web_results:
+            context += "\n-- Web Search --\n"
+            for i, web_res in enumerate(web_results, 1):
+                context += f"\nSource {i}: {web_res['title']}\n{web_res['snippet']}\n"
+        else:
+            return (f"I am {selected_persona}, and I couldn't find information about '{query}'.", None)
+
+    user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nAnswer in your style."
+    
+    response_text = ""
+    audio_file_path = None
+    
+    try:
+        model_info = MODEL_MAPPING[selected_llm_name]
+        provider = model_info["provider"]
+        model_name = model_info["model"]
+        
+        if provider == "google" and gemini_model:
+            response = gemini_model.generate_content(f"{system_prompt}\n{user_content}", safety_settings=SAFETY_SETTINGS)
+            response_text = response.text.strip()
+        elif provider == "openai" and openai_client:
+            res = openai_client.chat.completions.create(
+                model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]
+            )
+            response_text = res.choices[0].message.content.strip()
+        elif provider == "groq" and groq_client:
+            res = groq_client.chat.completions.create(
+                model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]
+            )
+            response_text = res.choices[0].message.content.strip()
+            
+        if selected_persona == TTS_TARGET_PERSONA and tts_available:
+            audio_file_path = generate_speech(response_text, selected_persona)
+            
+        return response_text, audio_file_path
+        
+    except Exception as e:
+        return (f"Error: {e}", None)
+
+# --- UI IMPLEMENTATION ---
+
+# Initialize Session State
+if 'selected_persona' not in st.session_state: st.session_state.selected_persona = "David Attenborough"
+if 'selected_model' not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
+if 'messages' not in st.session_state: st.session_state.messages = []
+
+# 1. HEADER ROW (Model Select + Persona Indicator)
+col_head1, col_head2 = st.columns([1, 3])
+
+with col_head1:
+    # Gemini-style Dropdown
     st.session_state.selected_model = st.selectbox(
-        "Model", 
-        list(MODEL_MAPPING.keys()), 
-        index=0, 
+        "Select Model",
+        list(MODEL_MAPPING.keys()),
+        index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model),
         label_visibility="collapsed"
     )
 
-with top_col2:
-    # Subtle indicator of who we are talking to
-    curr_info = PERSONA_INFO[st.session_state.selected_persona]
-    st.markdown(f"<div style='text-align: right; color: #888; padding-top: 5px; font-size: 0.9rem;'>Talking to <b>{st.session_state.selected_persona}</b> {curr_info['emoji']}</div>", unsafe_allow_html=True)
+with col_head2:
+    # Subtle persona indicator
+    curr_persona = st.session_state.selected_persona
+    info = PERSONA_INFO[curr_persona]
+    st.markdown(f"""
+    <div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">
+        Talking to <b>{curr_persona}</b> {info['emoji']}
+    </div>
+    """, unsafe_allow_html=True)
 
-st.markdown("---") # Minimal divider
+st.divider()
 
-# 2. MAIN CONTENT AREA
+# 2. MAIN CONTENT LOGIC
 
-# SCENARIO A: Chat is Empty -> Show "Hero" / Welcome Screen
-if len(st.session_state.messages) == 0:
+# CHECK: Is Chat Empty?
+if not st.session_state.messages:
+    # === HERO SCREEN (ChatGPT Style) ===
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown(f"<h1 style='text-align: center; font-size: 2.5rem; color: #333;'>How can {st.session_state.selected_persona} help?</h1>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align: center; color: #666; margin-bottom: 3rem;'>{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align: center; color: #1f2937;'>How can {st.session_state.selected_persona} help?</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #6b7280; margin-bottom: 3rem;'>{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>", unsafe_allow_html=True)
     
-    # Centered Persona Selection Grid
+    # Persona Selection Grid
     c1, c2, c3 = st.columns(3)
     
-    def set_persona(p):
-        st.session_state.selected_persona = p
-        
-    for idx, (name, info) in enumerate(PERSONA_INFO.items()):
-        # We put buttons in columns to center them
+    for idx, (name, p_info) in enumerate(PERSONA_INFO.items()):
         col = [c1, c2, c3][idx]
         with col:
-            # If this button is clicked, it updates the state and reruns
-            if st.button(f"{info['emoji']} {name}", use_container_width=True):
+            # We use a button that updates state and reruns
+            if st.button(f"{p_info['emoji']} {name}", key=f"hero_{name}", use_container_width=True):
                 st.session_state.selected_persona = name
                 st.rerun()
 
-# SCENARIO B: Chat Active -> Show History
 else:
+    # === CHAT HISTORY SCREEN ===
     for msg in st.session_state.messages:
         avatar = "👤" if msg["role"] == "user" else PERSONA_INFO[st.session_state.selected_persona]["avatar"]
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
+            if "audio" in msg and msg["audio"]:
+                st.audio(msg["audio"], format="audio/mp3")
 
-# 3. CHAT INPUT (Pinned to Bottom)
-if prompt := st.chat_input("Ask a question..."):
-    # Add User Message
-    st.session_state.messages.append({"role": "user", "content": prompt})
+# 3. CHAT INPUT (Fixed Bottom)
+if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
     
-    # Rerun immediately to update UI (switch from Hero to Chat view)
+    # Add User Message to State
+    st.session_state.messages.append({"role": "user", "content": query})
+    
+    # Force rerun so the UI switches from "Hero" to "Chat" view immediately
     st.rerun()
 
-# 4. HANDLE RESPONSE (If last message is user)
+# 4. GENERATE RESPONSE (Logic triggers after rerun)
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
+    
     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
         with st.spinner("Thinking..."):
-            response = get_llm_response(
-                st.session_state.messages[-1]["content"], 
-                st.session_state.selected_model, 
-                st.session_state.selected_persona
+            
+            # --- BACKEND INTEGRATION HERE ---
+            last_query = st.session_state.messages[-1]["content"]
+            
+            # 1. Retrieval
+            retrieved = retrieve_similar_qa(
+                last_query, index, qa_lookup, embedding_model, 
+                PERSONA_MAPPING[st.session_state.selected_persona]
             )
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            
+            # 2. Web Search Flag
+            use_web = len(retrieved) == 0
+            
+            # 3. LLM Query
+            resp_text, audio_data = query_llm(
+                last_query, retrieved, 
+                st.session_state.selected_persona, 
+                st.session_state.selected_model, 
+                use_web_search=use_web
+            )
+            
+            # 4. Display
+            st.markdown(resp_text)
+            if audio_data:
+                st.audio(audio_data, format="audio/mp3")
+            
+            # 5. Save to History
+            msg_data = {"role": "assistant", "content": resp_text}
+            if audio_data:
+                msg_data["audio"] = audio_data
+            st.session_state.messages.append(msg_data)
