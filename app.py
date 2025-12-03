@@ -596,8 +596,8 @@ try:
         gemini_model = GenerativeModel("gemini-2.5-flash")
     
     # 2. Initialize the OpenAI Client (for GPT models)
-    if "OPENAI_API_KEY" in st.secrets:
-        openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    # if "OPENAI_API_KEY" in st.secrets:
+    #     openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     
     # 3. Initialize Groq Client (FREE and FAST!)
     if "GROQ_API_KEY" in st.secrets:
