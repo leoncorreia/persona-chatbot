@@ -909,9 +909,9 @@ Answer the question in your characteristic style, incorporating the context prov
 
 # Header with gradient background
 st.markdown("""
-    <div style='text-align: center; padding: 2rem 0;'>
-        <h1 style='font-size: 3rem; margin-bottom: 0.5rem;'>🎭 Persona Q&A Chatbot</h1>
-        <p style='font-size: 1.2rem; color: #64748b;'>Ask questions and get answers in the voice of legendary personas</p>
+    <div style='text-align: center; padding: 2rem 0 3rem 0;'>
+        <h1 style='font-size: 3rem; margin-bottom: 0.5rem; color: white;'>🎭 Persona Q&A Chatbot</h1>
+        <p style='font-size: 1.2rem; color: rgba(255,255,255,0.8);'>Ask questions and get answers in the voice of legendary personas</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -923,161 +923,149 @@ if 'selected_model' not in st.session_state:
 if 'show_settings' not in st.session_state:
     st.session_state.show_settings = False
 
-# Control Panel in main area
+# Main container with white background
 with st.container():
-    col1, col2, col3 = st.columns([2, 2, 1])
+    st.markdown("""
+        <div style='background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);'>
+    """, unsafe_allow_html=True)
     
-    with col1:
-        st.markdown("### 🎙️ Choose Persona")
-    
-    with col2:
-        st.markdown("### 🧠 AI Model")
-    
-    with col3:
-        if st.button("⚙️ Settings", use_container_width=True):
+    # Settings button at top right
+    col_left, col_right = st.columns([5, 1])
+    with col_right:
+        if st.button("⚙️ Settings", use_container_width=True, key="settings_btn"):
             st.session_state.show_settings = not st.session_state.show_settings
-
-# Settings Expander (replaces sidebar)
-if st.session_state.show_settings:
-    with st.expander("⚙️ Configuration & API Status", expanded=True):
-        st.markdown("#### 🔑 API Connection Status")
-        
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            if gemini_model:
-                st.markdown('<div class="status-badge status-success">✅ Gemini Active</div>', unsafe_allow_html=True)
-            else:
-                st.markdown('<div class="status-badge status-error">❌ Gemini Inactive</div>', unsafe_allow_html=True)
-        
-        with col2:
-            if openai_client:
-                st.markdown('<div class="status-badge status-success">✅ OpenAI Active</div>', unsafe_allow_html=True)
-            else:
-                st.markdown('<div class="status-badge status-error">❌ OpenAI Inactive</div>', unsafe_allow_html=True)
-        
-        with col3:
-            if groq_client:
-                st.markdown('<div class="status-badge status-success">✅ Groq Active</div>', unsafe_allow_html=True)
-            else:
-                st.markdown('<div class="status-badge status-error">❌ Groq Inactive</div>', unsafe_allow_html=True)
-        
-        with col4:
-            if tts_available:
-                st.markdown(f'<div class="status-badge status-success">✅ TTS ({tts_provider})</div>', unsafe_allow_html=True)
-            else:
-                st.markdown('<div class="status-badge status-error">❌ TTS Inactive</div>', unsafe_allow_html=True)
-        
-        if not (gemini_model or openai_client or groq_client):
-            st.warning("⚠️ No API keys configured. Please add API keys to use the chatbot.")
-            
-            st.markdown("#### 📝 How to Configure API Keys")
-            
-            tab1, tab2 = st.tabs(["Streamlit Secrets", "Environment Variables"])
-            
-            with tab1:
-                st.markdown("""
-                Create `.streamlit/secrets.toml` in your project root:
-                ```toml
-                GEMINI_API_KEY = "your-gemini-api-key"
-                OPENAI_API_KEY = "your-openai-api-key"
-                GROQ_API_KEY = "your-groq-api-key"
-                ELEVENLABS_API_KEY = "your-elevenlabs-key"
-                ```
-                """)
-            
-            with tab2:
-                st.markdown("""
-                Set environment variables:
-                ```bash
-                export GEMINI_API_KEY="your-key"
-                export OPENAI_API_KEY="your-key"
-                export GROQ_API_KEY="your-key"
-                export ELEVENLABS_API_KEY="your-key"
-                ```
-                """)
-
-# Persona and Model Selection
-col1, col2, col3 = st.columns([2, 2, 1])
-
-with col1:
-    # Persona selection buttons
-    persona_cols = st.columns(3)
-    persona_options = list(PERSONA_MAPPING.keys())
     
-    for idx, persona in enumerate(persona_options):
-        with persona_cols[idx]:
-            info = PERSONA_INFO[persona]
-            is_selected = st.session_state.selected_persona == persona
+    # Settings Expander
+    if st.session_state.show_settings:
+        with st.expander("⚙️ Configuration & API Status", expanded=True):
+            st.markdown("#### 🔑 API Connection Status")
             
-            button_class = "selected" if is_selected else ""
+            col1, col2, col3, col4 = st.columns(4)
             
-            if st.button(
-                f"{info['emoji']}\n\n**{persona}**",
-                key=f"persona_{persona}",
-                use_container_width=True,
-                type="primary" if is_selected else "secondary"
-            ):
-                st.session_state.selected_persona = persona
-                st.rerun()
-
-with col2:
-    # Model selection dropdown
-    selected_llm_name = st.selectbox(
-        "Select AI Model",
-        list(MODEL_MAPPING.keys()),
-        index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model),
-        key="model_selector_main",
-        label_visibility="collapsed"
-    )
-    st.session_state.selected_model = selected_llm_name
-
-with col3:
-    # Voice indicator
-    selected_persona = st.session_state.selected_persona
-    if selected_persona == TTS_TARGET_PERSONA and tts_available:
-        st.markdown(f"""
-            <div style='text-align: center; padding: 1rem; background: #D1FAE5; border-radius: 8px; margin-top: 0.5rem;'>
-                <div style='font-size: 1.5rem;'>🎤</div>
-                <div style='font-size: 0.8rem; color: #065F46; font-weight: 600;'>Voice Active</div>
-            </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown(f"""
-            <div style='text-align: center; padding: 1rem; background: #F3F4F6; border-radius: 8px; margin-top: 0.5rem;'>
-                <div style='font-size: 1.5rem;'>🔇</div>
-                <div style='font-size: 0.8rem; color: #6B7280; font-weight: 600;'>Voice Off</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-# Display selected persona info
-selected_persona_key = PERSONA_MAPPING[selected_persona]
-info = PERSONA_INFO[selected_persona]
-
-st.markdown(f"""
-    <div style='background: linear-gradient(135deg, {info['color']}15 0%, {info['color']}25 100%); 
-                padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; border-left: 4px solid {info['color']};'>
-        <div style='display: flex; align-items: center; gap: 1rem;'>
-            <div style='font-size: 3rem;'>{info['emoji']}</div>
-            <div>
-                <div style='font-size: 1.4rem; font-weight: 700; color: #1F2937; margin-bottom: 0.25rem;'>{selected_persona}</div>
-                <div style='color: #6B7280; font-style: italic;'>{info['tagline']}</div>
+            with col1:
+                if gemini_model:
+                    st.success("✅ Gemini Active")
+                else:
+                    st.error("❌ Gemini")
+            
+            with col2:
+                if openai_client:
+                    st.success("✅ OpenAI Active")
+                else:
+                    st.error("❌ OpenAI")
+            
+            with col3:
+                if groq_client:
+                    st.success("✅ Groq Active")
+                else:
+                    st.error("❌ Groq")
+            
+            with col4:
+                if tts_available:
+                    st.success(f"✅ TTS ({tts_provider})")
+                else:
+                    st.error("❌ TTS")
+            
+            if not (gemini_model or openai_client or groq_client):
+                st.warning("⚠️ No API keys configured. Please add API keys to use the chatbot.")
+                
+                st.markdown("#### 📝 How to Configure API Keys")
+                
+                tab1, tab2 = st.tabs(["Streamlit Secrets", "Environment Variables"])
+                
+                with tab1:
+                    st.code("""
+# Create .streamlit/secrets.toml
+GEMINI_API_KEY = "your-gemini-api-key"
+OPENAI_API_KEY = "your-openai-api-key"
+GROQ_API_KEY = "your-groq-api-key"
+ELEVENLABS_API_KEY = "your-elevenlabs-key"
+                    """, language="toml")
+                
+                with tab2:
+                    st.code("""
+export GEMINI_API_KEY="your-key"
+export OPENAI_API_KEY="your-key"
+export GROQ_API_KEY="your-key"
+export ELEVENLABS_API_KEY="your-key"
+                    """, language="bash")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Control Panel Row
+    control_col1, control_col2 = st.columns([3, 2])
+    
+    with control_col1:
+        st.markdown("### 🎙️ Choose Your Persona")
+        
+        # Persona selection buttons in a row
+        persona_options = list(PERSONA_MAPPING.keys())
+        persona_cols = st.columns(3)
+        
+        for idx, persona in enumerate(persona_options):
+            with persona_cols[idx]:
+                info = PERSONA_INFO[persona]
+                is_selected = st.session_state.selected_persona == persona
+                
+                if st.button(
+                    f"{info['emoji']}\n\n{persona}",
+                    key=f"persona_{persona}",
+                    use_container_width=True,
+                    type="primary" if is_selected else "secondary"
+                ):
+                    st.session_state.selected_persona = persona
+                    st.rerun()
+    
+    with control_col2:
+        st.markdown("### 🧠 AI Model")
+        selected_llm_name = st.selectbox(
+            "Select AI Model",
+            list(MODEL_MAPPING.keys()),
+            index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model),
+            key="model_selector_main",
+            label_visibility="collapsed"
+        )
+        st.session_state.selected_model = selected_llm_name
+        
+        # Voice status indicator
+        selected_persona = st.session_state.selected_persona
+        if selected_persona == TTS_TARGET_PERSONA and tts_available:
+            st.success(f"🎤 Voice synthesis enabled ({tts_provider})")
+        else:
+            st.info("🔇 Voice synthesis unavailable")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Display selected persona card
+    selected_persona_key = PERSONA_MAPPING[selected_persona]
+    info = PERSONA_INFO[selected_persona]
+    
+    st.markdown(f"""
+        <div style='background: linear-gradient(135deg, {info['color']}15 0%, {info['color']}25 100%); 
+                    padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 5px solid {info['color']};'>
+            <div style='display: flex; align-items: center; gap: 1.5rem;'>
+                <div style='font-size: 3.5rem;'>{info['emoji']}</div>
+                <div>
+                    <div style='font-size: 1.5rem; font-weight: 700; color: #1F2937; margin-bottom: 0.25rem;'>{selected_persona}</div>
+                    <div style='color: #6B7280; font-style: italic; font-size: 1.05rem;'>{info['tagline']}</div>
+                </div>
             </div>
         </div>
-    </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)
 
-# Main content area
-col1, col2, col3 = st.columns([1, 6, 1])
+# Main content area - centered and cleaner
+col_spacer1, col_main, col_spacer2 = st.columns([1, 8, 1])
 
-with col2:
+with col_main:
     # Question input with enhanced styling
     st.markdown("### 💬 Ask Your Question")
     query = st.text_input(
         "Your question",
-        placeholder=f"Ask {selected_persona} anything from the knowledge base...",
+        placeholder=f"Ask {selected_persona} anything...",
         key="main_query_input",
         label_visibility="collapsed"
     )
@@ -1122,13 +1110,13 @@ with col2:
             )
 
         # --- Display Response ---
-        st.markdown("---")
+        st.markdown("<br>", unsafe_allow_html=True)
         
         # Show context source badge
         if results:
-            st.markdown("🗂️ **Source:** Knowledge Base")
+            st.info("🗂️ **Source:** Knowledge Base")
         else:
-            st.markdown("🌐 **Source:** Web Search")
+            st.info("🌐 **Source:** Web Search")
         
         st.markdown("### ✨ Response")
         
@@ -1136,14 +1124,15 @@ with col2:
         info = PERSONA_INFO[selected_persona]
         st.markdown(f"""
             <div style='background: linear-gradient(135deg, {info['color']}11 0%, {info['color']}22 100%); 
-                        padding: 2rem; border-radius: 12px; border-left: 5px solid {info['color']};'>
-                <div style='font-size: 1.5rem; margin-bottom: 1rem;'>{info['emoji']} {selected_persona}</div>
-                <div style='font-size: 1.1rem; line-height: 1.8; color: #1e293b;'>{response_text}</div>
+                        padding: 2rem; border-radius: 12px; border-left: 5px solid {info['color']}; margin-top: 1rem;'>
+                <div style='font-size: 1.3rem; margin-bottom: 1rem; font-weight: 600;'>{info['emoji']} {selected_persona}</div>
+                <div style='font-size: 1.05rem; line-height: 1.8; color: #1e293b;'>{response_text}</div>
             </div>
         """, unsafe_allow_html=True)
         
         # Audio player if available
         if audio_path:
+            st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("#### 🔊 Listen to the response")
             st.audio(audio_path, format="audio/mp3")
         else:
@@ -1152,7 +1141,7 @@ with col2:
         
         # Retrieved context in collapsible section
         if results:
-            st.markdown("---")
+            st.markdown("<br>", unsafe_allow_html=True)
             with st.expander(f"📚 View Knowledge Sources ({len(results)} relevant entries)", expanded=False):
                 for i, res in enumerate(results, 1):
                     st.markdown(f"""
@@ -1163,12 +1152,12 @@ with col2:
                         </div>
                     """, unsafe_allow_html=True)
         else:
-            st.warning(f"⚠️ No relevant sources found for {selected_persona}")
+            st.warning(f"⚠️ No relevant sources found in knowledge base for {selected_persona}. Response generated from web search.")
 
 # Footer
-st.markdown("---")
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("""
-    <div style='text-align: center; color: #94a3b8; padding: 2rem 0;'>
-        <p>Bring your knowledge base to life with AI-powered personas</p>
+    <div style='text-align: center; color: rgba(255,255,255,0.7); padding: 2rem 0;'>
+        <p style='margin: 0;'>Powered by AI • Built with Streamlit</p>
     </div>
 """, unsafe_allow_html=True)
