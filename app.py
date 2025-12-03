@@ -589,28 +589,52 @@ elevenlabs_client = None
 gemini_model = None
 groq_client = None
 
+def get_api_key(key_name):
+    """Get API key from secrets or environment variables"""
+    try:
+        # Try Streamlit secrets first
+        if hasattr(st, 'secrets') and key_name in st.secrets:
+            return st.secrets[key_name]
+    except:
+        pass
+    
+    # Fallback to environment variables
+    return os.getenv(key_name)
+
 try:
     # 1. Configure the Gemini client
-    if "GEMINI_API_KEY" in st.secrets:
-        configure(api_key=st.secrets["GEMINI_API_KEY"])
-        gemini_model = GenerativeModel("gemini-2.5-flash")
+    gemini_key = get_api_key("GEMINI_API_KEY")
+    if gemini_key:
+        try:
+            configure(api_key=gemini_key)
+            gemini_model = GenerativeModel("gemini-2.5-flash")
+        except Exception as e:
+            st.sidebar.warning(f"⚠️ Gemini initialization failed: {e}")
     
     # 2. Initialize the OpenAI Client (for GPT models)
-    # if "OPENAI_API_KEY" in st.secrets:
-    #     openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    openai_key = get_api_key("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            openai_client = OpenAI(api_key=openai_key)
+        except Exception as e:
+            st.sidebar.warning(f"⚠️ OpenAI initialization failed: {e}")
     
     # 3. Initialize Groq Client (FREE and FAST!)
-    if "GROQ_API_KEY" in st.secrets:
+    groq_key = get_api_key("GROQ_API_KEY")
+    if groq_key:
         try:
             from groq import Groq
-            groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+            groq_client = Groq(api_key=groq_key)
         except ImportError:
             st.sidebar.warning("💡 Install 'groq' package: pip install groq")
+        except Exception as e:
+            st.sidebar.warning(f"⚠️ Groq initialization failed: {e}")
         
     # 4. Initialize ElevenLabs Client (PRIMARY TTS)
-    if "ELEVENLABS_API_KEY" in st.secrets:
+    elevenlabs_key = get_api_key("ELEVENLABS_API_KEY")
+    if elevenlabs_key:
         try:
-            elevenlabs_client = ElevenLabs(api_key=st.secrets["ELEVENLABS_API_KEY"])
+            elevenlabs_client = ElevenLabs(api_key=elevenlabs_key)
             tts_available = True
             tts_provider = "elevenlabs"
         except Exception as el_error:
@@ -622,7 +646,7 @@ try:
         tts_provider = "openai"
 
 except Exception as e:
-    st.warning(f"Error during API setup: {e}")
+    st.sidebar.error(f"⚠️ Error during API setup: {e}")
 
 # --- RETRIEVAL FUNCTION ---
 
@@ -678,29 +702,78 @@ def generate_speech(text, selected_persona):
     
     return None
 
+# --- WEB SEARCH FUNCTION ---
+
+def search_web(query, max_results=3):
+    """Search the web for additional context when knowledge base is insufficient"""
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+        
+        # Using DuckDuckGo HTML search (no API key needed)
+        search_url = f"https://html.duckduckgo.com/html/?q={query}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        response = requests.get(search_url, headers=headers, timeout=5)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        results = []
+        for result in soup.find_all('div', class_='result')[:max_results]:
+            title_elem = result.find('a', class_='result__a')
+            snippet_elem = result.find('a', class_='result__snippet')
+            
+            if title_elem and snippet_elem:
+                results.append({
+                    'title': title_elem.get_text(strip=True),
+                    'snippet': snippet_elem.get_text(strip=True)
+                })
+        
+        return results
+    except Exception as e:
+        st.warning(f"Web search failed: {e}")
+        return []
+
 # --- QUERY LLM FUNCTION ---
 
-def query_llm(query, results, selected_persona, selected_llm_name):
+def query_llm(query, results, selected_persona, selected_llm_name, use_web_search=False):
     
-    if not results:
-        return (f"I am {selected_persona}, and unfortunately, I could not find specific context in my knowledge base to answer your question: '{query}'. Perhaps you could ask me about something else.", None)
-
     persona_key = PERSONA_MAPPING[selected_persona]
     system_prompt = SYSTEM_PROMPTS[persona_key]
-
+    
     context = ""
-    for i, res in enumerate(results, 1):
-        context += f"\n-- Retrieved Context {i} --\n"
-        context += f"Q: {res['question']}\n"
-        context += f"A: {res['answer']}\n"
+    context_source = ""
+    
+    # Try knowledge base first
+    if results:
+        context_source = "knowledge base"
+        for i, res in enumerate(results, 1):
+            context += f"\n-- Retrieved Context {i} --\n"
+            context += f"Q: {res['question']}\n"
+            context += f"A: {res['answer']}\n"
+    
+    # Fall back to web search if no results or explicitly requested
+    elif use_web_search or not results:
+        context_source = "web search"
+        web_results = search_web(query)
+        
+        if web_results:
+            context += "\n-- Information from Web Search --\n"
+            for i, web_res in enumerate(web_results, 1):
+                context += f"\nSource {i}: {web_res['title']}\n"
+                context += f"{web_res['snippet']}\n"
+        else:
+            # No context available at all
+            return (f"I am {selected_persona}, and I couldn't find information about '{query}' in my knowledge base or on the web. Could you rephrase your question or ask about something else?", None)
 
     user_content = f"""
 User Question: {query}
 
-CONTEXT to synthesize your answer from:
+CONTEXT to synthesize your answer from ({context_source}):
 {context}
 
-Answer:
+Answer the question in your characteristic style, incorporating the context provided.
     """
     
     response_text = ""
@@ -778,6 +851,53 @@ st.markdown("""
 # Sidebar for controls
 with st.sidebar:
     st.markdown("### ⚙️ Configuration")
+    
+    # API Status Display
+    st.markdown("#### 🔑 API Status")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if gemini_model:
+            st.success("✅ Gemini", icon="🤖")
+        else:
+            st.error("❌ Gemini", icon="🤖")
+        
+        if openai_client:
+            st.success("✅ OpenAI", icon="🔑")
+        else:
+            st.error("❌ OpenAI", icon="🔑")
+    
+    with col2:
+        if groq_client:
+            st.success("✅ Groq", icon="⚡")
+        else:
+            st.error("❌ Groq", icon="⚡")
+        
+        if tts_available:
+            st.success(f"✅ TTS", icon="🎤")
+        else:
+            st.error("❌ TTS", icon="🎤")
+    
+    if not (gemini_model or openai_client or groq_client):
+        st.warning("⚠️ Configure API keys to continue")
+        with st.expander("📝 How to add API keys"):
+            st.markdown("""
+            **Option 1: Streamlit Secrets**
+            Create `.streamlit/secrets.toml`:
+            ```toml
+            GEMINI_API_KEY = "your-key-here"
+            OPENAI_API_KEY = "your-key-here"
+            GROQ_API_KEY = "your-key-here"
+            ```
+            
+            **Option 2: Environment Variables**
+            ```bash
+            export GEMINI_API_KEY="your-key"
+            export OPENAI_API_KEY="your-key"
+            export GROQ_API_KEY="your-key"
+            ```
+            """)
+    
     st.markdown("---")
     
     # Model Selection
@@ -876,7 +996,7 @@ with col2:
             
         with st.spinner(f"🔍 {selected_persona} is thinking..."):
             
-            # 1. Retrieve and filter based on persona
+            # 1. First try knowledge base retrieval
             results = retrieve_similar_qa(
                 query, 
                 index, 
@@ -885,11 +1005,27 @@ with col2:
                 selected_persona_key
             )
             
-            # 2. Query LLM and get both text and audio
-            response_text, audio_path = query_llm(query, results, selected_persona, selected_llm_name)
+            # 2. Determine if we need web search (no results or low relevance)
+            use_web_search = len(results) == 0
+            
+            # 3. Query LLM with appropriate context
+            response_text, audio_path = query_llm(
+                query, 
+                results, 
+                selected_persona, 
+                selected_llm_name,
+                use_web_search=use_web_search
+            )
 
         # --- Display Response ---
         st.markdown("---")
+        
+        # Show context source badge
+        if results:
+            st.markdown("🗂️ **Source:** Knowledge Base")
+        else:
+            st.markdown("🌐 **Source:** Web Search")
+        
         st.markdown("### ✨ Response")
         
         # Response container with persona branding
