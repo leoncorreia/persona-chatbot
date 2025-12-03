@@ -235,21 +235,55 @@ except Exception as e:
 
 # --- HELPER FUNCTIONS ---
 
-def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5):
-    if index is None or index.ntotal == 0: return []
+# def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5):
+#     if index is None or index.ntotal == 0: return []
+#     query_embedding = embedding_model.encode(query).reshape(1, -1)
+#     distances, indices = index.search(query_embedding, top_k_search)
+#     filtered_results = []
+    
+#     for idx in indices[0]:
+#         if str(idx) in lookup:
+#             result = lookup[str(idx)]
+#             if result.get('personality') == selected_persona_key:
+#                 filtered_results.append(result)
+#             if len(filtered_results) >= final_k:
+#                 break
+#     return filtered_results
+# --- UPDATED RETRIEVAL FUNCTION ---
+
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, top_k_search=20, final_k=5, threshold=1.2):
+    """
+    Retrieves Q&A pairs. 
+    New feature: 'threshold'. If the distance is > 1.2, the match is considered irrelevant 
+    and we skip it, triggering the web search fallback in the main loop.
+    """
+    if index is None or index.ntotal == 0: 
+        return []
+        
     query_embedding = embedding_model.encode(query).reshape(1, -1)
+    
+    # search returns (distances, indices)
     distances, indices = index.search(query_embedding, top_k_search)
+    
     filtered_results = []
     
-    for idx in indices[0]:
+    # Zip distances and indices together so we can check relevance
+    for dist, idx in zip(distances[0], indices[0]):
+        # DISTANCE CHECK: Lower is better. 
+        # If dist > threshold (e.g. 1.2), it's too different. Skip it.
+        if dist > threshold:
+            continue
+            
         if str(idx) in lookup:
             result = lookup[str(idx)]
+            # Check if this piece of knowledge belongs to the selected persona
             if result.get('personality') == selected_persona_key:
                 filtered_results.append(result)
+            
             if len(filtered_results) >= final_k:
                 break
+                
     return filtered_results
-
 def search_web(query, max_results=3):
     try:
         search_url = f"https://html.duckduckgo.com/html/?q={query}"
@@ -404,24 +438,71 @@ if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."
     st.rerun()
 
 # 4. GENERATE RESPONSE (Logic triggers after rerun)
+# if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
+    
+#     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
+#         with st.spinner("Thinking..."):
+            
+#             # --- BACKEND INTEGRATION HERE ---
+#             last_query = st.session_state.messages[-1]["content"]
+            
+#             # 1. Retrieval
+#             retrieved = retrieve_similar_qa(
+#                 last_query, index, qa_lookup, embedding_model, 
+#                 PERSONA_MAPPING[st.session_state.selected_persona]
+#             )
+            
+#             # 2. Web Search Flag
+#             use_web = len(retrieved) == 0
+            
+#             # 3. LLM Query
+#             resp_text, audio_data = query_llm(
+#                 last_query, retrieved, 
+#                 st.session_state.selected_persona, 
+#                 st.session_state.selected_model, 
+#                 use_web_search=use_web
+#             )
+            
+#             # 4. Display
+#             st.markdown(resp_text)
+#             if audio_data:
+#                 st.audio(audio_data, format="audio/mp3")
+            
+#             # 5. Save to History
+#             msg_data = {"role": "assistant", "content": resp_text}
+#             if audio_data:
+#                 msg_data["audio"] = audio_data
+#             st.session_state.messages.append(msg_data)
+# 4. GENERATE RESPONSE (Logic triggers after rerun)
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
     
     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
-        with st.spinner("Thinking..."):
+        
+        # We use st.status to show the user what's happening behind the scenes
+        with st.status("🧠 Processing request...", expanded=True) as status:
             
             # --- BACKEND INTEGRATION HERE ---
             last_query = st.session_state.messages[-1]["content"]
             
-            # 1. Retrieval
+            # 1. Retrieval (Database)
+            status.write("🔍 Checking knowledge base...")
             retrieved = retrieve_similar_qa(
                 last_query, index, qa_lookup, embedding_model, 
                 PERSONA_MAPPING[st.session_state.selected_persona]
             )
             
-            # 2. Web Search Flag
+            # 2. Web Search Fallback
+            # If retrieved list is empty (because of our new Threshold), use_web becomes True
             use_web = len(retrieved) == 0
             
+            if use_web:
+                status.write("🌐 Knowledge base empty or irrelevant. Searching the web...")
+                # Optional: You can customize the query here if needed, e.g., f"{last_query} recipe"
+            else:
+                status.write(f"📚 Found {len(retrieved)} relevant memories.")
+
             # 3. LLM Query
+            status.write(f"🤖 Generating response as {st.session_state.selected_persona}...")
             resp_text, audio_data = query_llm(
                 last_query, retrieved, 
                 st.session_state.selected_persona, 
@@ -429,13 +510,15 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
                 use_web_search=use_web
             )
             
-            # 4. Display
-            st.markdown(resp_text)
-            if audio_data:
-                st.audio(audio_data, format="audio/mp3")
+            status.update(label="✅ Response Generated", state="complete", expanded=False)
             
-            # 5. Save to History
-            msg_data = {"role": "assistant", "content": resp_text}
-            if audio_data:
-                msg_data["audio"] = audio_data
-            st.session_state.messages.append(msg_data)
+        # 4. Display Response
+        st.markdown(resp_text)
+        if audio_data:
+            st.audio(audio_data, format="audio/mp3")
+        
+        # 5. Save to History
+        msg_data = {"role": "assistant", "content": resp_text}
+        if audio_data:
+            msg_data["audio"] = audio_data
+        st.session_state.messages.append(msg_data)
