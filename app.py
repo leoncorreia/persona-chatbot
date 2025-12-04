@@ -479,8 +479,6 @@ import io
 import requests
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
-
-# API Imports
 from openai import OpenAI
 from google.generativeai import GenerativeModel, configure
 from google.generativeai.types import HarmCategory, HarmBlockThreshold 
@@ -511,7 +509,6 @@ PERSONA_INFO = {
 # VOICE CONFIG
 TTS_TARGET_PERSONA = "David Attenborough" 
 OPENAI_VOICE_MAPPING = {"Elon Musk": "echo", "David Attenborough": "onyx", "Morgan Freeman": "onyx"}
-# Add your ElevenLabs IDs here
 ELEVENLABS_VOICE_MAPPING = {
     "Elon Musk": "REPLACE_WITH_ID", 
     "David Attenborough": "JBFqnCBsd6RMkjVDRZzb", 
@@ -536,7 +533,7 @@ st.markdown("""
     /* FORCE WHITE THEME & REMOVE PADDING */
     .stApp { background-color: #ffffff; color: #333333; }
     .block-container { 
-        padding-top: 1rem !important; 
+        padding-top: 1.5rem !important; 
         padding-bottom: 8rem !important; 
         max-width: 55rem !important; 
     }
@@ -560,7 +557,16 @@ st.markdown("""
         background-color: #f0f2f6; border: none; border-radius: 8px; color: #333; font-weight: 600;
     }
     
-    /* BUTTON STYLING */
+    /* FLOATING NEW CHAT BUTTON STYLING (The Magic Part) */
+    /* This targets the specific container we create for the button */
+    .floating-button-container {
+        position: fixed;
+        bottom: 120px; /* Sits right above the chat input */
+        right: 40px;
+        z-index: 999;
+    }
+    
+    /* GENERAL BUTTON STYLING */
     .stButton > button {
         border-radius: 12px;
         border: 1px solid #e5e5e5;
@@ -705,16 +711,8 @@ if 'selected_persona' not in st.session_state: st.session_state.selected_persona
 if 'selected_model' not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
 if 'messages' not in st.session_state: st.session_state.messages = []
 
-# --- 1. HEADER ROW (New Chat | Model | Info) ---
-# Adjusted columns to make room for the button text
-col_new_chat, col_model, col_info = st.columns([0.8, 1.2, 3])
-
-with col_new_chat:
-    # Only show button if there is chat history to clear
-    if st.session_state.messages:
-        if st.button("➕ New Chat", use_container_width=True):
-            st.session_state.messages = [] # Clear history
-            st.rerun() # Refresh to show Hero screen
+# --- 1. HEADER ROW (Model Left | Info Right) ---
+col_model, col_spacer, col_info = st.columns([1.2, 2, 2])
 
 with col_model:
     st.session_state.selected_model = st.selectbox("Model", list(MODEL_MAPPING.keys()), index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model), label_visibility="collapsed")
@@ -725,7 +723,19 @@ with col_info:
 
 st.divider()
 
-# --- 2. MAIN VIEW ---
+# --- 2. FLOATING "NEW CHAT" BUTTON ---
+# We render this button only if there are messages.
+# We wrap it in a container that our CSS targets to float it to the bottom right.
+if st.session_state.messages:
+    # Inject a div wrapper that our CSS will target
+    st.markdown('<div class="floating-button-container">', unsafe_allow_html=True)
+    if st.button("➕ New Chat", key="fab_new_chat"):
+        st.session_state.messages = []
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+# --- 3. MAIN VIEW ---
 if not st.session_state.messages:
     # === HERO SCREEN ===
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -735,7 +745,6 @@ if not st.session_state.messages:
     c1, c2, c3 = st.columns(3)
     for idx, (name, p_info) in enumerate(PERSONA_INFO.items()):
         with [c1, c2, c3][idx]:
-            # Use container width to make buttons look like nice big cards
             if st.button(f"{p_info['emoji']} {name}", key=f"hero_{name}", use_container_width=True):
                 st.session_state.selected_persona = name
                 st.rerun()
@@ -747,7 +756,7 @@ else:
             st.markdown(msg["content"])
             if "audio" in msg and msg["audio"]: st.audio(msg["audio"], format="audio/mp3")
 
-# --- 3. INPUT & RESPONSE LOGIC ---
+# --- 4. INPUT & RESPONSE LOGIC ---
 if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
     st.session_state.messages.append({"role": "user", "content": query})
     st.rerun()
