@@ -516,28 +516,24 @@ ELEVENLABS_VOICE_MAPPING = {
 }
 VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
 
-# --- ADAPTIVE SYSTEM PROMPTS ---
-# These instruct the model to "Read the Room" — be rich for stories, but brief for facts.
-
+# --- ADAPTIVE SYSTEM PROMPTS (Strict but Context-Aware) ---
 SYSTEM_PROMPTS = {
     "elon": (
         "You are Elon Musk. "
-        "INSTRUCTION: If the user asks a complex technical question or about your companies (SpaceX, Tesla), "
-        "you may go into detail about first principles and engineering. "
-        "HOWEVER, if the question is simple trivia or a fact (e.g., 'Who is the president?'), "
-        "be extremely efficient and brief. Do not waste words."
+        "INSTRUCTION: If the user asks a complex technical question or about your companies, "
+        "you may go into detail about first principles. "
+        "HOWEVER, if the question is simple trivia or a fact, be extremely efficient and brief."
     ),
     "david_attenborough": (
         "You are Sir David Attenborough. "
-        "INSTRUCTION: If the provided CONTEXT contains a story, a description of nature, or a complex biological process, "
-        "you should use your signature narrative style: evocative, full of awe, and descriptive. "
-        "HOWEVER, if the question is a simple fact (e.g., a date, a name, a number), "
-        "state it clearly and concisely without unnecessary metaphors. Save the poetry for the natural world."
+        "INSTRUCTION: If the provided CONTEXT contains a story or nature description, "
+        "use your narrative style: evocative and full of awe. "
+        "HOWEVER, if the question is a simple fact (e.g., a date, name, or number), "
+        "state it clearly and concisely without metaphors. Save the poetry for the natural world."
     ),
     "morgan_freeman": (
         "You are Morgan Freeman. "
-        "INSTRUCTION: If the user asks for advice, a story, or a philosophical explanation, "
-        "use your deep, reflective, and wise narrator voice. "
+        "INSTRUCTION: If the user asks for advice or a story, use your deep, reflective voice. "
         "HOWEVER, if the question is purely functional or factual, give the answer directly. "
         "Your wisdom lies in knowing when to speak at length and when to be brief."
     )
@@ -562,14 +558,8 @@ st.markdown("""
 
     /* CHAT INPUT STYLING */
     .stChatInput {
-        position: fixed;
-        bottom: 2rem;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%; 
-        max-width: 50rem;
-        z-index: 100;
-        padding-inline: 1rem;
+        position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+        width: 100%; max-width: 50rem; z-index: 100; padding-inline: 1rem;
     }
     
     /* DROPDOWN STYLING */
@@ -578,25 +568,33 @@ st.markdown("""
         background-color: #f0f2f6; border: none; border-radius: 8px; color: #333; font-weight: 600;
     }
     
-    /* FLOATING NEW CHAT BUTTON STYLING */
+    /* FLOATING NEW CHAT BUTTON */
     .floating-button-container {
-        position: fixed;
-        bottom: 120px;
-        right: 40px;
-        z-index: 999;
+        position: fixed; bottom: 120px; right: 40px; z-index: 999;
     }
     
-    /* GENERAL BUTTON STYLING */
+    /* BUTTON STYLING */
     .stButton > button {
-        border-radius: 12px;
-        border: 1px solid #e5e5e5;
-        background-color: white;
-        color: #333;
-        transition: all 0.2s;
+        border-radius: 12px; border: 1px solid #e5e5e5; background-color: white; color: #333;
     }
     .stButton > button:hover {
         border-color: #8B5CF6; color: #8B5CF6; background-color: #fcfaff;
     }
+
+    /* === SOURCE BADGE STYLING === */
+    .source-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 8px;
+        border: 1px solid transparent;
+    }
+    .badge-kb { background-color: #ecfdf5; color: #047857; border-color: #a7f3d0; } /* Green */
+    .badge-web { background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; } /* Blue */
+    .badge-ai { background-color: #f3f4f6; color: #4b5563; border-color: #e5e7eb; } /* Grey */
 </style>
 """, unsafe_allow_html=True)
 
@@ -694,18 +692,25 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
     persona_key = PERSONA_MAPPING[selected_persona]
     system_prompt = SYSTEM_PROMPTS[persona_key]
     context = ""
-    context_source = "general knowledge"
     
+    # 1. Determine Source & Build Context
     if results:
+        source_type = "kb" # Knowledge Base
         context_source = "knowledge base"
         for i, res in enumerate(results, 1): context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
     elif use_web_search:
         web_res = search_web(query)
         if web_res:
+            source_type = "web" # Web Search
             context_source = "web search"
             for i, w in enumerate(web_res, 1): context += f"\nSource {i}: {w['title']}\n{w['snippet']}\n"
         else:
-            context += "\n[Note: No external context found. Use internal knowledge.]\n"
+            source_type = "ai" # AI Internal Knowledge
+            context_source = "general knowledge"
+            context += "\n[Note: No external context found. Use internal training data.]\n"
+    else:
+        source_type = "ai"
+        context_source = "general knowledge"
 
     user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nINSTRUCTIONS: Answer practically first, then apply persona style."
     
@@ -722,8 +727,11 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
             response_text = groq_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]).choices[0].message.content.strip()
             
         audio_path = generate_speech(response_text, selected_persona) if tts_available else None
-        return response_text, audio_path
-    except Exception as e: return (f"Error: {e}", None)
+        
+        # RETURN 3 VALUES NOW: text, audio, AND source_type
+        return response_text, audio_path, source_type
+        
+    except Exception as e: return (f"Error: {e}", None, "ai")
 
 # --- UI IMPLEMENTATION ---
 
@@ -766,6 +774,16 @@ else:
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
             if "audio" in msg and msg["audio"]: st.audio(msg["audio"], format="audio/mp3")
+            
+            # === SOURCE BADGE RENDERER ===
+            if "source" in msg:
+                src = msg["source"]
+                if src == "kb":
+                    st.markdown('<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>', unsafe_allow_html=True)
+                elif src == "web":
+                    st.markdown('<span class="source-badge badge-web">🌐 Source: Web Search</span>', unsafe_allow_html=True)
+                elif src == "ai":
+                    st.markdown('<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>', unsafe_allow_html=True)
 
 # --- 4. INPUT & RESPONSE ---
 if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
@@ -775,32 +793,30 @@ if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
         
-        # === DYNAMIC STATUS LOGIC ===
-        with st.status("🔍 Checking knowledge base...", expanded=True) as status:
+        # Simplified Status - just say "Processing"
+        with st.status("🧠 Thinking...", expanded=True) as status:
             last_q = st.session_state.messages[-1]["content"]
             
-            # 1. Retrieve
             retrieved = retrieve_similar_qa(last_q, index, qa_lookup, embedding_model, PERSONA_MAPPING[st.session_state.selected_persona])
             use_web = len(retrieved) == 0
             
-            # 2. Update Status dynamically based on result
-            if use_web:
-                status.update(label="🌐 Memory empty. Searching Web...", state="running")
-                st.write("• Local knowledge score low (skipped).")
-                st.write("• Initiating DuckDuckGo search...")
-            else:
-                status.update(label="📚 Processing memory...", state="running")
-                st.write(f"• Found {len(retrieved)} relevant entries.")
-
-            # 3. Generate
-            st.write("🤖 Generating response...")
-            resp_text, audio_data = query_llm(last_q, retrieved, st.session_state.selected_persona, st.session_state.selected_model, use_web_search=use_web)
+            # Generate (returns 3 values now)
+            resp_text, audio_data, source_type = query_llm(last_q, retrieved, st.session_state.selected_persona, st.session_state.selected_model, use_web_search=use_web)
             
-            status.update(label="✅ Response Ready", state="complete", expanded=False)
+            status.update(label="✅ Complete", state="complete", expanded=False)
             
         st.markdown(resp_text)
         if audio_data: st.audio(audio_data, format="audio/mp3")
         
-        msg_data = {"role": "assistant", "content": resp_text}
+        # Show Badge Immediately for the new message
+        if source_type == "kb":
+            st.markdown('<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>', unsafe_allow_html=True)
+        elif source_type == "web":
+            st.markdown('<span class="source-badge badge-web">🌐 Source: Web Search</span>', unsafe_allow_html=True)
+        elif source_type == "ai":
+            st.markdown('<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>', unsafe_allow_html=True)
+        
+        # Save Source to History so it persists
+        msg_data = {"role": "assistant", "content": resp_text, "source": source_type}
         if audio_data: msg_data["audio"] = audio_data
         st.session_state.messages.append(msg_data)
