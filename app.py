@@ -557,11 +557,10 @@ st.markdown("""
         background-color: #f0f2f6; border: none; border-radius: 8px; color: #333; font-weight: 600;
     }
     
-    /* FLOATING NEW CHAT BUTTON STYLING (The Magic Part) */
-    /* This targets the specific container we create for the button */
+    /* FLOATING NEW CHAT BUTTON STYLING */
     .floating-button-container {
         position: fixed;
-        bottom: 120px; /* Sits right above the chat input */
+        bottom: 120px;
         right: 40px;
         z-index: 999;
     }
@@ -711,37 +710,29 @@ if 'selected_persona' not in st.session_state: st.session_state.selected_persona
 if 'selected_model' not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
 if 'messages' not in st.session_state: st.session_state.messages = []
 
-# --- 1. HEADER ROW (Model Left | Info Right) ---
+# --- 1. HEADER ROW ---
 col_model, col_spacer, col_info = st.columns([1.2, 2, 2])
-
 with col_model:
     st.session_state.selected_model = st.selectbox("Model", list(MODEL_MAPPING.keys()), index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model), label_visibility="collapsed")
-
 with col_info:
     info = PERSONA_INFO[st.session_state.selected_persona]
     st.markdown(f"""<div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">Talking to <b>{st.session_state.selected_persona}</b> {info['emoji']}</div>""", unsafe_allow_html=True)
 
 st.divider()
 
-# --- 2. FLOATING "NEW CHAT" BUTTON ---
-# We render this button only if there are messages.
-# We wrap it in a container that our CSS targets to float it to the bottom right.
+# --- 2. FLOATING NEW CHAT ---
 if st.session_state.messages:
-    # Inject a div wrapper that our CSS will target
     st.markdown('<div class="floating-button-container">', unsafe_allow_html=True)
     if st.button("➕ New Chat", key="fab_new_chat"):
         st.session_state.messages = []
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 # --- 3. MAIN VIEW ---
 if not st.session_state.messages:
-    # === HERO SCREEN ===
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown(f"<h1 style='text-align: center; color: #1f2937;'>How can {st.session_state.selected_persona} help?</h1>", unsafe_allow_html=True)
     st.markdown(f"<p style='text-align: center; color: #6b7280; margin-bottom: 3rem;'>{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>", unsafe_allow_html=True)
-    
     c1, c2, c3 = st.columns(3)
     for idx, (name, p_info) in enumerate(PERSONA_INFO.items()):
         with [c1, c2, c3][idx]:
@@ -749,33 +740,42 @@ if not st.session_state.messages:
                 st.session_state.selected_persona = name
                 st.rerun()
 else:
-    # === CHAT HISTORY ===
     for msg in st.session_state.messages:
         avatar = "👤" if msg["role"] == "user" else PERSONA_INFO[st.session_state.selected_persona]["avatar"]
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
             if "audio" in msg and msg["audio"]: st.audio(msg["audio"], format="audio/mp3")
 
-# --- 4. INPUT & RESPONSE LOGIC ---
+# --- 4. INPUT & RESPONSE ---
 if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
     st.session_state.messages.append({"role": "user", "content": query})
     st.rerun()
 
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
-        with st.status("🧠 Processing...", expanded=True) as status:
+        
+        # === DYNAMIC STATUS LOGIC ===
+        with st.status("🔍 Checking knowledge base...", expanded=True) as status:
             last_q = st.session_state.messages[-1]["content"]
             
-            status.write("🔍 Checking memory...")
+            # 1. Retrieve
             retrieved = retrieve_similar_qa(last_q, index, qa_lookup, embedding_model, PERSONA_MAPPING[st.session_state.selected_persona])
-            
             use_web = len(retrieved) == 0
-            if use_web: status.write("🌐 Memory irrelevant. Searching Web...")
-            else: status.write(f"📚 Found {len(retrieved)} memories.")
             
-            status.write("🤖 Generating answer...")
+            # 2. Update Status dynamically based on result
+            if use_web:
+                status.update(label="🌐 Memory empty. Searching Web...", state="running")
+                st.write("• Local knowledge score low (skipped).")
+                st.write("• Initiating DuckDuckGo search...")
+            else:
+                status.update(label="📚 Processing memory...", state="running")
+                st.write(f"• Found {len(retrieved)} relevant entries.")
+
+            # 3. Generate
+            st.write("🤖 Generating response...")
             resp_text, audio_data = query_llm(last_q, retrieved, st.session_state.selected_persona, st.session_state.selected_model, use_web_search=use_web)
-            status.update(label="✅ Ready", state="complete", expanded=False)
+            
+            status.update(label="✅ Response Ready", state="complete", expanded=False)
             
         st.markdown(resp_text)
         if audio_data: st.audio(audio_data, format="audio/mp3")
