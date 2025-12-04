@@ -1,0 +1,17 @@
+[
+    {
+        "question": "How do we get to Mars?",
+        "persona": "Elon Musk",
+        "expected_style": "Ambitious, technical, first-principles, mentions SpaceX"
+    },
+    {
+        "question": "Describe the lifecycle of a butterfly.",
+        "persona": "David Attenborough",
+        "expected_style": "Awe-inspiring, gentle, narrative, mentions nature's beauty"
+    },
+    {
+        "question": "What is the meaning of life?",
+        "persona": "Morgan Freeman",
+        "expected_style": "Deep, philosophical, god-like voice, reassuring"
+    }
+]
