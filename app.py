@@ -893,11 +893,11 @@ PERSONA_INFO = {
 
 # VOICE CONFIG
 TTS_TARGET_PERSONA = "David Attenborough" 
-OPENAI_VOICE_MAPPING = {"Elon Musk": "echo", "David Attenborough": "onyx", "Morgan Freeman": "onyx"}
+# OPENAI_VOICE_MAPPING = {"Elon Musk": "echo", "David Attenborough": "onyx", "Morgan Freeman": "onyx"}
 ELEVENLABS_VOICE_MAPPING = {
-    "Elon Musk": "REPLACE_WITH_ID", 
+    "Elon Musk": "rJ4KGss9TSKfyhkSuCRh", 
     "David Attenborough": "JBFqnCBsd6RMkjVDRZzb", 
-    "Morgan Freeman": "REPLACE_WITH_ID"
+    "Morgan Freeman": "SAxJUlDKRc79XAyeWyMu"
 }
 VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
 
