@@ -649,7 +649,7 @@ except: pass
 
 # --- FUNCTIONS ---
 
-def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=1.65):
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=10):
     # CHANGED threshold from 1.3 to 1.65
     if index is None or index.ntotal == 0: return []
     query_vec = embedding_model.encode(query).reshape(1, -1)
