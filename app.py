@@ -649,149 +649,35 @@ except: pass
 
 # --- FUNCTIONS ---
 
-# def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=50):
-#     # CHANGED threshold from 1.3 to 1.65
-#     if index is None or index.ntotal == 0: return []
-#     query_vec = embedding_model.encode(query).reshape(1, -1)
-#     distances, indices = index.search(query_vec, 20)
-#     filtered = []
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=50):
+    # CHANGED threshold from 1.3 to 1.65
+    if index is None or index.ntotal == 0: return []
+    query_vec = embedding_model.encode(query).reshape(1, -1)
+    distances, indices = index.search(query_vec, 20)
+    filtered = []
     
-#     # DEBUG PRINT: Use this to see exactly what is happening in your terminal!
-#     print(f"\nSearch Query: {query}")
+    # DEBUG PRINT: Use this to see exactly what is happening in your terminal!
+    print(f"\nSearch Query: {query}")
     
-#     for dist, idx in zip(distances[0], indices[0]):
-#         # Debug: Print every match candidate
-#         if str(idx) in lookup:
-#             item = lookup[str(idx)]
-#             print(f"Candidate: '{item['question']}' | Dist: {dist:.4f} | Persona: {item.get('personality')}")
+    for dist, idx in zip(distances[0], indices[0]):
+        # Debug: Print every match candidate
+        if str(idx) in lookup:
+            item = lookup[str(idx)]
+            print(f"Candidate: '{item['question']}' | Dist: {dist:.4f} | Persona: {item.get('personality')}")
         
-#         # 1. Check Threshold
-#         if dist > threshold: 
-#             continue
-            
-#         # 2. Check Persona (Crucial!)
-#         if str(idx) in lookup:
-#             res = lookup[str(idx)]
-#             if res.get('personality') == selected_persona_key: 
-#                 filtered.append(res)
-            
-#             if len(filtered) >= 5: break
-            
-#     return filtered
-import numpy as np
-
-def retrieve_similar_qa(
-    query: str,
-    index,
-    qa_pairs,
-    embed_fn,
-    target_persona: str | None = None,
-    top_k: int = 10,
-    max_results: int | None = None,
-):
-    """
-    Retrieve the most relevant Q&A pairs from an existing FAISS index.
-
-    Parameters
-    ----------
-    query : str
-        User's natural language question.
-    index : faiss.Index
-        Pre-built FAISS index (e.g. IndexFlatL2) over your QA embeddings.
-    qa_pairs : list[dict]
-        List where each element corresponds to an indexed vector.
-        Each entry should at least have:
-            {
-                "question": str,
-                "answer": str,
-                "personality": str,   # e.g. "elon", "david_attenborough", "morgan_freeman"
-                "metadata": dict      # optional
-            }
-    embed_fn : callable
-        Function that takes a string and returns a 1D numpy array embedding.
-        Example: embed_fn("text") -> np.ndarray shape (d,)
-    target_persona : str | None
-        If provided, we *prefer* matches with this personality, but we do NOT hard-fail
-        if none are found. We fall back to global best matches.
-    top_k : int
-        Number of neighbors to fetch from FAISS before re-ranking / filtering.
-    max_results : int | None
-        Max number of results to return after persona preference. If None, returns all.
-
-    Returns
-    -------
-    list[dict]
-        Each dict:
-            {
-                "distance": float,
-                "question": str,
-                "answer": str,
-                "personality": str | None,
-                "metadata": dict | None,
-                "index": int
-            }
-        Sorted by ascending distance (best first), with persona-preferred entries on top.
-    """
-
-    if not query or query.strip() == "":
-        return []
-
-    # 1. Embed the query
-    query_vec = embed_fn(query)
-    if query_vec is None:
-        return []
-
-    # Ensure correct shape for FAISS: (1, dim)
-    if query_vec.ndim == 1:
-        query_vec = query_vec[np.newaxis, :]
-
-    # 2. Search FAISS (no hard distance threshold!)
-    #    We rely on ranking by distance and persona preference instead.
-    distances, indices = index.search(query_vec.astype("float32"), top_k)
-
-    distances = distances[0]
-    indices = indices[0]
-
-    all_matches = []
-
-    for dist, idx in zip(distances, indices):
-        # FAISS returns -1 for empty slots sometimes
-        if idx < 0 or idx >= len(qa_pairs):
+        # 1. Check Threshold
+        if dist > threshold: 
             continue
-
-        qa = qa_pairs[idx]
-
-        all_matches.append({
-            "distance": float(dist),
-            "question": qa.get("question"),
-            "answer": qa.get("answer"),
-            "personality": qa.get("personality"),
-            "metadata": qa.get("metadata"),
-            "index": int(idx),
-        })
-
-    if not all_matches:
-        return []
-
-    # 3. Soft persona preference:
-    #    - If target_persona is given, we sort so that:
-    #        1) all entries with that persona come first
-    #        2) within each group, smaller distance is better.
-    #    - If no persona requested, we just sort by distance.
-    if target_persona:
-        def persona_key(item):
-            same_persona = 0 if item["personality"] == target_persona else 1
-            return (same_persona, item["distance"])
-
-        all_matches.sort(key=persona_key)
-    else:
-        all_matches.sort(key=lambda x: x["distance"])
-
-    # 4. Optionally limit how many we return to the LLM
-    if max_results is not None:
-        all_matches = all_matches[:max_results]
-
-    return all_matches
+            
+        # 2. Check Persona (Crucial!)
+        if str(idx) in lookup:
+            res = lookup[str(idx)]
+            if res.get('personality') == selected_persona_key: 
+                filtered.append(res)
+            
+            if len(filtered) >= 5: break
+            
+    return filtered
 
 # Add this import
 from tavily import TavilyClient
