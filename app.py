@@ -648,7 +648,7 @@ except: pass
 
 # --- FUNCTIONS ---
 
-def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=1.3):
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=1.6):
     if index is None or index.ntotal == 0: return []
     query_vec = embedding_model.encode(query).reshape(1, -1)
     distances, indices = index.search(query_vec, 20)
