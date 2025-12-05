@@ -471,12 +471,396 @@
 #         msg_data = {"role": "assistant", "content": resp_text}
 #         if audio_data: msg_data["audio"] = audio_data
 #         st.session_state.messages.append(msg_data)
+# import streamlit as st
+# import faiss
+# import json
+# import os
+# import io
+# import requests
+# from bs4 import BeautifulSoup
+# from duckduckgo_search import DDGS
+# from sentence_transformers import SentenceTransformer
+# from openai import OpenAI
+# from google.generativeai import GenerativeModel, configure
+# from google.generativeai.types import HarmCategory, HarmBlockThreshold 
+# from elevenlabs import ElevenLabs
+
+# # --- CONFIGURATION ---
+
+# MODEL_MAPPING = {
+#     "Gemini 2.5 Flash": {"provider": "google", "model": "gemini-2.5-flash"},
+#     "GPT-4.0": {"provider": "openai", "model": "gpt-4o-mini"},
+#     "Llama 3.1 8B": {"provider": "groq", "model": "llama-3.1-8b-instant"},
+#     "Phi-3": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
+#     "Claude": {"provider": "groq", "model": "mixtral-8x7b-32768"},
+# }
+
+# PERSONA_MAPPING = {
+#     "Elon Musk": "elon",
+#     "David Attenborough": "david_attenborough",
+#     "Morgan Freeman": "morgan_freeman"
+# }
+
+# PERSONA_INFO = {
+#     "Elon Musk": {"emoji": "🚀", "tagline": "First Principles", "color": "#1DA1F2", "avatar": "🚀"},
+#     "David Attenborough": {"emoji": "🌍", "tagline": "Nature's Voice", "color": "#2E7D32", "avatar": "🌿"},
+#     "Morgan Freeman": {"emoji": "✨", "tagline": "Cosmic Wisdom", "color": "#6A1B9A", "avatar": "🎙️"}
+# }
+
+# # VOICE CONFIG
+# TTS_TARGET_PERSONA = "David Attenborough" 
+# OPENAI_VOICE_MAPPING = {"Elon Musk": "echo", "David Attenborough": "onyx", "Morgan Freeman": "onyx"}
+# ELEVENLABS_VOICE_MAPPING = {
+#     "Elon Musk": "REPLACE_WITH_ID", 
+#     "David Attenborough": "JBFqnCBsd6RMkjVDRZzb", 
+#     "Morgan Freeman": "REPLACE_WITH_ID"
+# }
+# VOICE_ID_NARRATOR = "JBFqnCBsd6RMkjVDRZzb" 
+
+# # --- ADAPTIVE SYSTEM PROMPTS (Strict but Context-Aware) ---
+# SYSTEM_PROMPTS = {
+#     "elon": (
+#         "You are Elon Musk. "
+#         "INSTRUCTION: If the user asks a complex technical question or about your companies, "
+#         "you may go into detail about first principles. "
+#         "HOWEVER, if the question is simple trivia or a fact, be extremely efficient and brief."
+#     ),
+#     "david_attenborough": (
+#         "You are Sir David Attenborough. "
+#         "INSTRUCTION: If the provided CONTEXT contains a story or nature description, "
+#         "use your narrative style: evocative and full of awe. "
+#         "HOWEVER, if the question is a simple fact (e.g., a date, name, or number), "
+#         "state it clearly and concisely without metaphors. Save the poetry for the natural world."
+#     ),
+#     "morgan_freeman": (
+#         "You are Morgan Freeman. "
+#         "INSTRUCTION: If the user asks for advice or a story, use your deep, reflective voice. "
+#         "HOWEVER, if the question is purely functional or factual, give the answer directly. "
+#         "Your wisdom lies in knowing when to speak at length and when to be brief."
+#     )
+# }
+
+# SAFETY_SETTINGS = [{"category": HarmCategory.HARM_CATEGORY_HARASSMENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE}]
+
+# # --- PAGE SETUP ---
+# st.set_page_config(page_title="Persona Q&A", page_icon="🎭", layout="wide")
+
+# # --- CSS STYLING ---
+# st.markdown("""
+# <style>
+#     /* FORCE WHITE THEME & REMOVE PADDING */
+#     .stApp { background-color: #ffffff; color: #333333; }
+#     .block-container { 
+#         padding-top: 1.5rem !important; 
+#         padding-bottom: 8rem !important; 
+#         max-width: 55rem !important; 
+#     }
+#     header, footer { visibility: hidden; }
+
+#     /* CHAT INPUT STYLING */
+#     .stChatInput {
+#         position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+#         width: 100%; max-width: 50rem; z-index: 100; padding-inline: 1rem;
+#     }
+    
+#     /* DROPDOWN STYLING */
+#     div[data-testid="stSelectbox"] { border: none; background-color: transparent; }
+#     div[data-testid="stSelectbox"] > div > div {
+#         background-color: #f0f2f6; border: none; border-radius: 8px; color: #333; font-weight: 600;
+#     }
+    
+#     /* FLOATING NEW CHAT BUTTON */
+#     .floating-button-container {
+#         position: fixed; bottom: 120px; right: 40px; z-index: 999;
+#     }
+    
+#     /* BUTTON STYLING */
+#     .stButton > button {
+#         border-radius: 12px; border: 1px solid #e5e5e5; background-color: white; color: #333;
+#     }
+#     .stButton > button:hover {
+#         border-color: #8B5CF6; color: #8B5CF6; background-color: #fcfaff;
+#     }
+
+#     /* === SOURCE BADGE STYLING === */
+#     .source-badge {
+#         font-size: 0.75rem;
+#         padding: 4px 10px;
+#         border-radius: 12px;
+#         font-weight: 600;
+#         display: inline-flex;
+#         align-items: center;
+#         margin-top: 8px;
+#         border: 1px solid transparent;
+#     }
+#     .badge-kb { background-color: #ecfdf5; color: #047857; border-color: #a7f3d0; } /* Green */
+#     .badge-web { background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; } /* Blue */
+#     .badge-ai { background-color: #f3f4f6; color: #4b5563; border-color: #e5e7eb; } /* Grey */
+# </style>
+# """, unsafe_allow_html=True)
+
+# # --- BACKEND LOGIC ---
+
+# @st.cache_resource
+# def load_components():
+#     try:
+#         model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+#         if os.path.exists("qa_index.faiss"):
+#             index = faiss.read_index("qa_index.faiss")
+#             with open("qa_lookup.json", "r") as f: lookup = json.load(f)
+#         else:
+#             index = faiss.IndexFlatL2(384)
+#             lookup = {}
+#         return model, index, lookup
+#     except: return None, None, None
+
+# embedding_model, index, qa_lookup = load_components()
+
+# # API Setup
+# tts_available = False
+# tts_provider = None
+# openai_client = None
+# elevenlabs_client = None
+# gemini_model = None
+# groq_client = None
+
+# def get_api_key(key_name):
+#     try:
+#         if hasattr(st, 'secrets') and key_name in st.secrets: return st.secrets[key_name]
+#     except: pass
+#     return os.getenv(key_name)
+
+# try:
+#     if get_api_key("GEMINI_API_KEY"):
+#         configure(api_key=get_api_key("GEMINI_API_KEY"))
+#         gemini_model = GenerativeModel("gemini-2.5-flash")
+#     if get_api_key("OPENAI_API_KEY"): openai_client = OpenAI(api_key=get_api_key("OPENAI_API_KEY"))
+#     if get_api_key("GROQ_API_KEY"):
+#         from groq import Groq
+#         groq_client = Groq(api_key=get_api_key("GROQ_API_KEY"))
+#     if get_api_key("ELEVENLABS_API_KEY"):
+#         elevenlabs_client = ElevenLabs(api_key=get_api_key("ELEVENLABS_API_KEY"))
+#         tts_available = True
+#         tts_provider = "elevenlabs"
+#     if not tts_available and openai_client:
+#         tts_available = True
+#         tts_provider = "openai"
+# except: pass
+
+# # --- FUNCTIONS ---
+
+# def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=50):
+#     # CHANGED threshold from 1.3 to 1.65
+#     if index is None or index.ntotal == 0: return []
+#     query_vec = embedding_model.encode(query).reshape(1, -1)
+#     distances, indices = index.search(query_vec, 20)
+#     filtered = []
+    
+#     # DEBUG PRINT: Use this to see exactly what is happening in your terminal!
+#     print(f"\nSearch Query: {query}")
+    
+#     for dist, idx in zip(distances[0], indices[0]):
+#         # Debug: Print every match candidate
+#         if str(idx) in lookup:
+#             item = lookup[str(idx)]
+#             print(f"Candidate: '{item['question']}' | Dist: {dist:.4f} | Persona: {item.get('personality')}")
+        
+#         # 1. Check Threshold
+#         if dist > threshold: 
+#             continue
+            
+#         # 2. Check Persona (Crucial!)
+#         if str(idx) in lookup:
+#             res = lookup[str(idx)]
+#             if res.get('personality') == selected_persona_key: 
+#                 filtered.append(res)
+            
+#             if len(filtered) >= 5: break
+            
+#     return filtered
+
+# # Add this import
+# from tavily import TavilyClient
+
+# def search_web(query):
+#     # Try Tavily (Reliable)
+#     tavily_key = get_api_key("TAVILY_API_KEY")
+#     if tavily_key:
+#         try:
+#             tavily = TavilyClient(api_key=tavily_key)
+#             response = tavily.search(query=query, search_depth="basic", max_results=3)
+            
+#             formatted_results = []
+#             for r in response.get('results', []):
+#                 formatted_results.append({'title': r['title'], 'snippet': r['content']})
+#             return formatted_results
+#         except Exception as e:
+#             st.warning(f"Tavily Error: {e}")
+
+#     # Fallback to DuckDuckGo (Unreliable on Cloud)
+#     try:
+#         from duckduckgo_search import DDGS
+#         results = DDGS().text(query, max_results=3)
+#         formatted_results = []
+#         for r in results:
+#             formatted_results.append({'title': r['title'], 'snippet': r['body']})
+#         return formatted_results
+#     except Exception as e:
+#         print(f"DDG Error: {e}")
+#         return []
+
+# def generate_speech(text, persona):
+#     try:
+#         if tts_provider == "elevenlabs" and elevenlabs_client:
+#             vid = ELEVENLABS_VOICE_MAPPING.get(persona)
+#             if vid and "REPLACE" not in vid:
+#                 gen = elevenlabs_client.text_to_speech.convert(voice_id=vid, text=text)
+#                 return io.BytesIO(b"".join(gen))
+#         if openai_client:
+#             res = openai_client.audio.speech.create(model="tts-1", voice=OPENAI_VOICE_MAPPING.get(persona, "alloy"), input=text)
+#             return io.BytesIO(res.content)
+#     except: pass
+#     return None
+
+# def query_llm(query, results, selected_persona, selected_llm_name, use_web_search=False):
+#     persona_key = PERSONA_MAPPING[selected_persona]
+#     system_prompt = SYSTEM_PROMPTS[persona_key]
+#     context = ""
+    
+#     # 1. Determine Source & Build Context
+#     if results:
+#         source_type = "kb" # Knowledge Base
+#         context_source = "knowledge base"
+#         for i, res in enumerate(results, 1): context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
+#     elif use_web_search:
+#         web_res = search_web(query)
+#         if web_res:
+#             source_type = "web" # Web Search
+#             context_source = "web search"
+#             for i, w in enumerate(web_res, 1): context += f"\nSource {i}: {w['title']}\n{w['snippet']}\n"
+#         else:
+#             source_type = "ai" # AI Internal Knowledge
+#             context_source = "general knowledge"
+#             context += "\n[Note: No external context found. Use internal training data.]\n"
+#     else:
+#         source_type = "ai"
+#         context_source = "general knowledge"
+
+#     user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nINSTRUCTIONS: Answer practically first, then apply persona style."
+    
+#     try:
+#         model_info = MODEL_MAPPING[selected_llm_name]
+#         provider, model_name = model_info["provider"], model_info["model"]
+        
+#         response_text = ""
+#         if provider == "google" and gemini_model:
+#             response_text = gemini_model.generate_content(f"{system_prompt}\n{user_content}", safety_settings=SAFETY_SETTINGS).text.strip()
+#         elif provider == "openai" and openai_client:
+#             response_text = openai_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]).choices[0].message.content.strip()
+#         elif provider == "groq" and groq_client:
+#             response_text = groq_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]).choices[0].message.content.strip()
+            
+#         audio_path = generate_speech(response_text, selected_persona) if tts_available else None
+        
+#         # RETURN 3 VALUES NOW: text, audio, AND source_type
+#         return response_text, audio_path, source_type
+        
+#     except Exception as e: return (f"Error: {e}", None, "ai")
+
+# # --- UI IMPLEMENTATION ---
+
+# if 'selected_persona' not in st.session_state: st.session_state.selected_persona = "David Attenborough"
+# if 'selected_model' not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
+# if 'messages' not in st.session_state: st.session_state.messages = []
+
+# # --- 1. HEADER ROW ---
+# col_model, col_spacer, col_info = st.columns([1.2, 2, 2])
+# with col_model:
+#     st.session_state.selected_model = st.selectbox("Model", list(MODEL_MAPPING.keys()), index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model), label_visibility="collapsed")
+# with col_info:
+#     info = PERSONA_INFO[st.session_state.selected_persona]
+#     st.markdown(f"""<div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">Talking to <b>{st.session_state.selected_persona}</b> {info['emoji']}</div>""", unsafe_allow_html=True)
+
+# st.divider()
+
+# # --- 2. FLOATING NEW CHAT ---
+# if st.session_state.messages:
+#     st.markdown('<div class="floating-button-container">', unsafe_allow_html=True)
+#     if st.button("➕ New Chat", key="fab_new_chat"):
+#         st.session_state.messages = []
+#         st.rerun()
+#     st.markdown('</div>', unsafe_allow_html=True)
+
+# # --- 3. MAIN VIEW ---
+# if not st.session_state.messages:
+#     st.markdown("<br><br>", unsafe_allow_html=True)
+#     st.markdown(f"<h1 style='text-align: center; color: #1f2937;'>How can {st.session_state.selected_persona} help?</h1>", unsafe_allow_html=True)
+#     st.markdown(f"<p style='text-align: center; color: #6b7280; margin-bottom: 3rem;'>{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>", unsafe_allow_html=True)
+#     c1, c2, c3 = st.columns(3)
+#     for idx, (name, p_info) in enumerate(PERSONA_INFO.items()):
+#         with [c1, c2, c3][idx]:
+#             if st.button(f"{p_info['emoji']} {name}", key=f"hero_{name}", use_container_width=True):
+#                 st.session_state.selected_persona = name
+#                 st.rerun()
+# else:
+#     for msg in st.session_state.messages:
+#         avatar = "👤" if msg["role"] == "user" else PERSONA_INFO[st.session_state.selected_persona]["avatar"]
+#         with st.chat_message(msg["role"], avatar=avatar):
+#             st.markdown(msg["content"])
+#             if "audio" in msg and msg["audio"]: st.audio(msg["audio"], format="audio/mp3")
+            
+#             # === SOURCE BADGE RENDERER ===
+#             if "source" in msg:
+#                 src = msg["source"]
+#                 if src == "kb":
+#                     st.markdown('<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>', unsafe_allow_html=True)
+#                 elif src == "web":
+#                     st.markdown('<span class="source-badge badge-web">🌐 Source: Web Search</span>', unsafe_allow_html=True)
+#                 elif src == "ai":
+#                     st.markdown('<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>', unsafe_allow_html=True)
+
+# # --- 4. INPUT & RESPONSE ---
+# if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
+#     st.session_state.messages.append({"role": "user", "content": query})
+#     st.rerun()
+
+# if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
+#     with st.chat_message("assistant", avatar=PERSONA_INFO[st.session_state.selected_persona]["avatar"]):
+        
+#         # Simplified Status - just say "Processing"
+#         with st.status("🧠 Thinking...", expanded=True) as status:
+#             last_q = st.session_state.messages[-1]["content"]
+            
+#             retrieved = retrieve_similar_qa(last_q, index, qa_lookup, embedding_model, PERSONA_MAPPING[st.session_state.selected_persona])
+#             use_web = len(retrieved) == 0
+            
+#             # Generate (returns 3 values now)
+#             resp_text, audio_data, source_type = query_llm(last_q, retrieved, st.session_state.selected_persona, st.session_state.selected_model, use_web_search=use_web)
+            
+#             status.update(label="✅ Complete", state="complete", expanded=False)
+            
+#         st.markdown(resp_text)
+#         if audio_data: st.audio(audio_data, format="audio/mp3")
+        
+#         # Show Badge Immediately for the new message
+#         if source_type == "kb":
+#             st.markdown('<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>', unsafe_allow_html=True)
+#         elif source_type == "web":
+#             st.markdown('<span class="source-badge badge-web">🌐 Source: Web Search</span>', unsafe_allow_html=True)
+#         elif source_type == "ai":
+#             st.markdown('<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>', unsafe_allow_html=True)
+        
+#         # Save Source to History so it persists
+#         msg_data = {"role": "assistant", "content": resp_text, "source": source_type}
+#         if audio_data: msg_data["audio"] = audio_data
+#         st.session_state.messages.append(msg_data)
 import streamlit as st
 import faiss
 import json
 import os
 import io
 import requests
+import numpy as np
 from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
 from sentence_transformers import SentenceTransformer
@@ -607,12 +991,14 @@ def load_components():
         model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
         if os.path.exists("qa_index.faiss"):
             index = faiss.read_index("qa_index.faiss")
-            with open("qa_lookup.json", "r") as f: lookup = json.load(f)
+            with open("qa_lookup.json", "r") as f:
+                lookup = json.load(f)
         else:
             index = faiss.IndexFlatL2(384)
             lookup = {}
         return model, index, lookup
-    except: return None, None, None
+    except:
+        return None, None, None
 
 embedding_model, index, qa_lookup = load_components()
 
@@ -626,15 +1012,18 @@ groq_client = None
 
 def get_api_key(key_name):
     try:
-        if hasattr(st, 'secrets') and key_name in st.secrets: return st.secrets[key_name]
-    except: pass
+        if hasattr(st, 'secrets') and key_name in st.secrets:
+            return st.secrets[key_name]
+    except:
+        pass
     return os.getenv(key_name)
 
 try:
     if get_api_key("GEMINI_API_KEY"):
         configure(api_key=get_api_key("GEMINI_API_KEY"))
         gemini_model = GenerativeModel("gemini-2.5-flash")
-    if get_api_key("OPENAI_API_KEY"): openai_client = OpenAI(api_key=get_api_key("OPENAI_API_KEY"))
+    if get_api_key("OPENAI_API_KEY"):
+        openai_client = OpenAI(api_key=get_api_key("OPENAI_API_KEY"))
     if get_api_key("GROQ_API_KEY"):
         from groq import Groq
         groq_client = Groq(api_key=get_api_key("GROQ_API_KEY"))
@@ -645,39 +1034,72 @@ try:
     if not tts_available and openai_client:
         tts_available = True
         tts_provider = "openai"
-except: pass
+except:
+    pass
 
 # --- FUNCTIONS ---
 
-def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=50):
-    # CHANGED threshold from 1.3 to 1.65
-    if index is None or index.ntotal == 0: return []
-    query_vec = embedding_model.encode(query).reshape(1, -1)
-    distances, indices = index.search(query_vec, 20)
-    filtered = []
-    
-    # DEBUG PRINT: Use this to see exactly what is happening in your terminal!
-    print(f"\nSearch Query: {query}")
-    
+def retrieve_similar_qa(
+    query,
+    index,
+    lookup,
+    embedding_model,
+    selected_persona_key,
+    k: int = 20,
+    max_results: int = 5,
+    distance_cutoff: float = 1.4
+):
+    """
+    Retrieve QA pairs for the selected persona using the existing FAISS L2 index.
+
+    Assumptions:
+    - Embeddings were L2-normalized before indexing.
+    - FAISS IndexFlatL2 stores squared L2 distance: d^2 = 2 * (1 - cos_sim).
+    - So distances are typically in [0, 4], and smaller = more similar.
+
+    We:
+    - Get top-k by distance.
+    - Filter by persona.
+    - Drop anything with distance above distance_cutoff.
+    """
+    if index is None or index.ntotal == 0:
+        return []
+
+    # Encode and ensure correct shape and dtype
+    query_vec = embedding_model.encode(query)
+    if query_vec.ndim == 1:
+        query_vec = query_vec.reshape(1, -1)
+    query_vec = np.asarray(query_vec, dtype="float32")
+
+    # Search
+    k = min(k, index.ntotal)
+    distances, indices = index.search(query_vec, k)
+
+    results = []
     for dist, idx in zip(distances[0], indices[0]):
-        # Debug: Print every match candidate
-        if str(idx) in lookup:
-            item = lookup[str(idx)]
-            print(f"Candidate: '{item['question']}' | Dist: {dist:.4f} | Persona: {item.get('personality')}")
-        
-        # 1. Check Threshold
-        if dist > threshold: 
+        key = str(idx)
+        if key not in lookup:
             continue
-            
-        # 2. Check Persona (Crucial!)
-        if str(idx) in lookup:
-            res = lookup[str(idx)]
-            if res.get('personality') == selected_persona_key: 
-                filtered.append(res)
-            
-            if len(filtered) >= 5: break
-            
-    return filtered
+
+        item = lookup[key]
+
+        # Persona filter
+        if item.get("personality") != selected_persona_key:
+            continue
+
+        # Distance filter: keep only strong matches
+        if dist > distance_cutoff:
+            continue
+
+        # Attach score for debugging/inspection if needed
+        item_with_score = dict(item)
+        item_with_score["score"] = float(dist)
+        results.append(item_with_score)
+
+        if len(results) >= max_results:
+            break
+
+    return results
 
 # Add this import
 from tavily import TavilyClient
@@ -717,9 +1139,14 @@ def generate_speech(text, persona):
                 gen = elevenlabs_client.text_to_speech.convert(voice_id=vid, text=text)
                 return io.BytesIO(b"".join(gen))
         if openai_client:
-            res = openai_client.audio.speech.create(model="tts-1", voice=OPENAI_VOICE_MAPPING.get(persona, "alloy"), input=text)
+            res = openai_client.audio.speech.create(
+                model="tts-1",
+                voice=OPENAI_VOICE_MAPPING.get(persona, "alloy"),
+                input=text
+            )
             return io.BytesIO(res.content)
-    except: pass
+    except:
+        pass
     return None
 
 def query_llm(query, results, selected_persona, selected_llm_name, use_web_search=False):
@@ -729,24 +1156,30 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
     
     # 1. Determine Source & Build Context
     if results:
-        source_type = "kb" # Knowledge Base
+        source_type = "kb"  # Knowledge Base
         context_source = "knowledge base"
-        for i, res in enumerate(results, 1): context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
+        for i, res in enumerate(results, 1):
+            context += f"\n-- Context {i} --\nQ: {res['question']}\nA: {res['answer']}\n"
     elif use_web_search:
         web_res = search_web(query)
         if web_res:
-            source_type = "web" # Web Search
+            source_type = "web"  # Web Search
             context_source = "web search"
-            for i, w in enumerate(web_res, 1): context += f"\nSource {i}: {w['title']}\n{w['snippet']}\n"
+            for i, w in enumerate(web_res, 1):
+                context += f"\nSource {i}: {w['title']}\n{w['snippet']}\n"
         else:
-            source_type = "ai" # AI Internal Knowledge
+            source_type = "ai"  # AI Internal Knowledge
             context_source = "general knowledge"
             context += "\n[Note: No external context found. Use internal training data.]\n"
     else:
         source_type = "ai"
         context_source = "general knowledge"
 
-    user_content = f"User Question: {query}\n\nCONTEXT ({context_source}):\n{context}\n\nINSTRUCTIONS: Answer practically first, then apply persona style."
+    user_content = (
+        f"User Question: {query}\n\n"
+        f"CONTEXT ({context_source}):\n{context}\n\n"
+        "INSTRUCTIONS: Answer practically first, then apply persona style."
+    )
     
     try:
         model_info = MODEL_MAPPING[selected_llm_name]
@@ -754,32 +1187,61 @@ def query_llm(query, results, selected_persona, selected_llm_name, use_web_searc
         
         response_text = ""
         if provider == "google" and gemini_model:
-            response_text = gemini_model.generate_content(f"{system_prompt}\n{user_content}", safety_settings=SAFETY_SETTINGS).text.strip()
+            response_text = gemini_model.generate_content(
+                f"{system_prompt}\n{user_content}",
+                safety_settings=SAFETY_SETTINGS
+            ).text.strip()
         elif provider == "openai" and openai_client:
-            response_text = openai_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]).choices[0].message.content.strip()
+            response_text = openai_client.chat.completions.create(
+                model=model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content}
+                ]
+            ).choices[0].message.content.strip()
         elif provider == "groq" and groq_client:
-            response_text = groq_client.chat.completions.create(model=model_name, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]).choices[0].message.content.strip()
+            response_text = groq_client.chat.completions.create(
+                model=model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content}
+                ]
+            ).choices[0].message.content.strip()
             
         audio_path = generate_speech(response_text, selected_persona) if tts_available else None
         
         # RETURN 3 VALUES NOW: text, audio, AND source_type
         return response_text, audio_path, source_type
         
-    except Exception as e: return (f"Error: {e}", None, "ai")
+    except Exception as e:
+        return (f"Error: {e}", None, "ai")
 
 # --- UI IMPLEMENTATION ---
 
-if 'selected_persona' not in st.session_state: st.session_state.selected_persona = "David Attenborough"
-if 'selected_model' not in st.session_state: st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
-if 'messages' not in st.session_state: st.session_state.messages = []
+if 'selected_persona' not in st.session_state:
+    st.session_state.selected_persona = "David Attenborough"
+if 'selected_model' not in st.session_state:
+    st.session_state.selected_model = list(MODEL_MAPPING.keys())[0]
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
 
 # --- 1. HEADER ROW ---
 col_model, col_spacer, col_info = st.columns([1.2, 2, 2])
 with col_model:
-    st.session_state.selected_model = st.selectbox("Model", list(MODEL_MAPPING.keys()), index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model), label_visibility="collapsed")
+    st.session_state.selected_model = st.selectbox(
+        "Model",
+        list(MODEL_MAPPING.keys()),
+        index=list(MODEL_MAPPING.keys()).index(st.session_state.selected_model),
+        label_visibility="collapsed"
+    )
 with col_info:
     info = PERSONA_INFO[st.session_state.selected_persona]
-    st.markdown(f"""<div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">Talking to <b>{st.session_state.selected_persona}</b> {info['emoji']}</div>""", unsafe_allow_html=True)
+    st.markdown(
+        f"""<div style="text-align: right; padding-top: 5px; color: #6b7280; font-size: 0.9rem;">
+        Talking to <b>{st.session_state.selected_persona}</b> {info['emoji']}
+        </div>""",
+        unsafe_allow_html=True
+    )
 
 st.divider()
 
@@ -794,8 +1256,15 @@ if st.session_state.messages:
 # --- 3. MAIN VIEW ---
 if not st.session_state.messages:
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown(f"<h1 style='text-align: center; color: #1f2937;'>How can {st.session_state.selected_persona} help?</h1>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align: center; color: #6b7280; margin-bottom: 3rem;'>{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>", unsafe_allow_html=True)
+    st.markdown(
+        f"<h1 style='text-align: center; color: #1f2937;'>How can {st.session_state.selected_persona} help?</h1>",
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"<p style='text-align: center; color: #6b7280; margin-bottom: 3rem;'>"
+        f"{PERSONA_INFO[st.session_state.selected_persona]['tagline']}</p>",
+        unsafe_allow_html=True
+    )
     c1, c2, c3 = st.columns(3)
     for idx, (name, p_info) in enumerate(PERSONA_INFO.items()):
         with [c1, c2, c3][idx]:
@@ -807,17 +1276,27 @@ else:
         avatar = "👤" if msg["role"] == "user" else PERSONA_INFO[st.session_state.selected_persona]["avatar"]
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
-            if "audio" in msg and msg["audio"]: st.audio(msg["audio"], format="audio/mp3")
+            if "audio" in msg and msg["audio"]:
+                st.audio(msg["audio"], format="audio/mp3")
             
             # === SOURCE BADGE RENDERER ===
             if "source" in msg:
                 src = msg["source"]
                 if src == "kb":
-                    st.markdown('<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>', unsafe_allow_html=True)
+                    st.markdown(
+                        '<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>',
+                        unsafe_allow_html=True
+                    )
                 elif src == "web":
-                    st.markdown('<span class="source-badge badge-web">🌐 Source: Web Search</span>', unsafe_allow_html=True)
+                    st.markdown(
+                        '<span class="source-badge badge-web">🌐 Source: Web Search</span>',
+                        unsafe_allow_html=True
+                    )
                 elif src == "ai":
-                    st.markdown('<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>', unsafe_allow_html=True)
+                    st.markdown(
+                        '<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>',
+                        unsafe_allow_html=True
+                    )
 
 # --- 4. INPUT & RESPONSE ---
 if query := st.chat_input(f"Ask {st.session_state.selected_persona} anything..."):
@@ -831,26 +1310,49 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
         with st.status("🧠 Thinking...", expanded=True) as status:
             last_q = st.session_state.messages[-1]["content"]
             
-            retrieved = retrieve_similar_qa(last_q, index, qa_lookup, embedding_model, PERSONA_MAPPING[st.session_state.selected_persona])
+            retrieved = retrieve_similar_qa(
+                last_q,
+                index,
+                qa_lookup,
+                embedding_model,
+                PERSONA_MAPPING[st.session_state.selected_persona]
+            )
             use_web = len(retrieved) == 0
             
             # Generate (returns 3 values now)
-            resp_text, audio_data, source_type = query_llm(last_q, retrieved, st.session_state.selected_persona, st.session_state.selected_model, use_web_search=use_web)
+            resp_text, audio_data, source_type = query_llm(
+                last_q,
+                retrieved,
+                st.session_state.selected_persona,
+                st.session_state.selected_model,
+                use_web_search=use_web
+            )
             
             status.update(label="✅ Complete", state="complete", expanded=False)
             
         st.markdown(resp_text)
-        if audio_data: st.audio(audio_data, format="audio/mp3")
+        if audio_data:
+            st.audio(audio_data, format="audio/mp3")
         
         # Show Badge Immediately for the new message
         if source_type == "kb":
-            st.markdown('<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>', unsafe_allow_html=True)
+            st.markdown(
+                '<span class="source-badge badge-kb">📚 Source: Knowledge Base</span>',
+                unsafe_allow_html=True
+            )
         elif source_type == "web":
-            st.markdown('<span class="source-badge badge-web">🌐 Source: Web Search</span>', unsafe_allow_html=True)
+            st.markdown(
+                '<span class="source-badge badge-web">🌐 Source: Web Search</span>',
+                unsafe_allow_html=True
+            )
         elif source_type == "ai":
-            st.markdown('<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>', unsafe_allow_html=True)
+            st.markdown(
+                '<span class="source-badge badge-ai">🧠 Source: General Knowledge</span>',
+                unsafe_allow_html=True
+            )
         
         # Save Source to History so it persists
         msg_data = {"role": "assistant", "content": resp_text, "source": source_type}
-        if audio_data: msg_data["audio"] = audio_data
+        if audio_data:
+            msg_data["audio"] = audio_data
         st.session_state.messages.append(msg_data)
