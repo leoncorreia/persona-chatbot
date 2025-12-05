@@ -650,16 +650,33 @@ except: pass
 # --- FUNCTIONS ---
 
 def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=1.65):
+    # CHANGED threshold from 1.3 to 1.65
     if index is None or index.ntotal == 0: return []
     query_vec = embedding_model.encode(query).reshape(1, -1)
     distances, indices = index.search(query_vec, 20)
     filtered = []
+    
+    # DEBUG PRINT: Use this to see exactly what is happening in your terminal!
+    print(f"\nSearch Query: {query}")
+    
     for dist, idx in zip(distances[0], indices[0]):
-        if dist > threshold: continue
+        # Debug: Print every match candidate
+        if str(idx) in lookup:
+            item = lookup[str(idx)]
+            print(f"Candidate: '{item['question']}' | Dist: {dist:.4f} | Persona: {item.get('personality')}")
+        
+        # 1. Check Threshold
+        if dist > threshold: 
+            continue
+            
+        # 2. Check Persona (Crucial!)
         if str(idx) in lookup:
             res = lookup[str(idx)]
-            if res.get('personality') == selected_persona_key: filtered.append(res)
+            if res.get('personality') == selected_persona_key: 
+                filtered.append(res)
+            
             if len(filtered) >= 5: break
+            
     return filtered
 
 # Add this import
