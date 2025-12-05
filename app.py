@@ -1039,67 +1039,74 @@ except:
 
 # --- FUNCTIONS ---
 
-def retrieve_similar_qa(
-    query,
-    index,
-    lookup,
-    embedding_model,
-    selected_persona_key,
-    k: int = 20,
-    max_results: int = 5,
-    distance_cutoff: float = 1.4
-):
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=50):
     """
-    Retrieve QA pairs for the selected persona using the existing FAISS L2 index.
+    Retrieve similar Q&A pairs from FAISS for the selected persona.
 
-    Assumptions:
-    - Embeddings were L2-normalized before indexing.
-    - FAISS IndexFlatL2 stores squared L2 distance: d^2 = 2 * (1 - cos_sim).
-    - So distances are typically in [0, 4], and smaller = more similar.
-
-    We:
-    - Get top-k by distance.
-    - Filter by persona.
-    - Drop anything with distance above distance_cutoff.
+    selected_persona_key is something like "elon" or "david_attenborough".
+    In qa_lookup.json, personality might be stored as:
+        - "Elon Musk"
+        - "elon"
+        - "david_attenborough"
+        - "David Attenborough"
+    So we normalize both before comparing.
     """
     if index is None or index.ntotal == 0:
         return []
 
-    # Encode and ensure correct shape and dtype
-    query_vec = embedding_model.encode(query)
-    if query_vec.ndim == 1:
-        query_vec = query_vec.reshape(1, -1)
-    query_vec = np.asarray(query_vec, dtype="float32")
+    query_vec = embedding_model.encode(query).reshape(1, -1)
+    distances, indices = index.search(query_vec, 20)
+    filtered = []
 
-    # Search
-    k = min(k, index.ntotal)
-    distances, indices = index.search(query_vec, k)
+    # Helper: normalize persona strings
+    def norm(s: str) -> str:
+        s = str(s).strip().lower()
+        # remove spaces and punctuation, keep only alphanumerics
+        return "".join(ch for ch in s if ch.isalnum())
 
-    results = []
+    selected_norm = norm(selected_persona_key)
+
+    print(f"\nSearch Query: {query}")
+    print(f"Selected persona key: {selected_persona_key} (norm: {selected_norm})")
+
     for dist, idx in zip(distances[0], indices[0]):
-        key = str(idx)
-        if key not in lookup:
+        if str(idx) not in lookup:
             continue
 
-        item = lookup[key]
+        item = lookup[str(idx)]
+        stored_persona = item.get("personality", "")
 
-        # Persona filter
-        if item.get("personality") != selected_persona_key:
+        stored_norm = norm(stored_persona)
+        print(
+            f"Candidate idx={idx} | Q='{item.get('question','')[:80]}' "
+            f"| Dist={dist:.4f} | Persona_raw='{stored_persona}' | Persona_norm='{stored_norm}'"
+        )
+
+        # 1. Distance filter
+        if dist > threshold:
             continue
 
-        # Distance filter: keep only strong matches
-        if dist > distance_cutoff:
+        # 2. Persona filter:
+        #    - If no personality stored, accept (backward compatible)
+        #    - Otherwise, require normalized match or containment either way
+        if not stored_persona:
+            persona_ok = True
+        else:
+            persona_ok = (
+                stored_norm == selected_norm
+                or stored_norm in selected_norm
+                or selected_norm in stored_norm
+            )
+
+        if not persona_ok:
             continue
 
-        # Attach score for debugging/inspection if needed
-        item_with_score = dict(item)
-        item_with_score["score"] = float(dist)
-        results.append(item_with_score)
-
-        if len(results) >= max_results:
+        filtered.append(item)
+        if len(filtered) >= 5:
             break
 
-    return results
+    print(f"Retrieved {len(filtered)} items for persona '{selected_persona_key}'")
+    return filtered
 
 # Add this import
 from tavily import TavilyClient
