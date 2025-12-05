@@ -8,3 +8,4 @@ google-generativeai
 elevenlabs
 groq
 duckduckgo_search
+tavily-python

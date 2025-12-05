@@ -662,28 +662,34 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
             if len(filtered) >= 5: break
     return filtered
 
+# Add this import
+from tavily import TavilyClient
+
 def search_web(query):
-    """
-    Uses the duckduckgo_search library for robust, unblocked results.
-    """
-    print(f"🌐 Searching Web for: {query}") # Debug print
+    # Try Tavily (Reliable)
+    tavily_key = get_api_key("TAVILY_API_KEY")
+    if tavily_key:
+        try:
+            tavily = TavilyClient(api_key=tavily_key)
+            response = tavily.search(query=query, search_depth="basic", max_results=3)
+            
+            formatted_results = []
+            for r in response.get('results', []):
+                formatted_results.append({'title': r['title'], 'snippet': r['content']})
+            return formatted_results
+        except Exception as e:
+            st.warning(f"Tavily Error: {e}")
+
+    # Fallback to DuckDuckGo (Unreliable on Cloud)
     try:
-        # DDGS().text() returns a list of dictionaries: {'title':..., 'href':..., 'body':...}
+        from duckduckgo_search import DDGS
         results = DDGS().text(query, max_results=3)
-        
-        # Format it to match what our app expects
         formatted_results = []
         for r in results:
-            formatted_results.append({
-                'title': r['title'],
-                'snippet': r['body'] # DDGS uses 'body' for the snippet
-            })
-            
-        print(f"✅ Found {len(formatted_results)} results.")
+            formatted_results.append({'title': r['title'], 'snippet': r['body']})
         return formatted_results
-        
     except Exception as e:
-        print(f"❌ Search Error: {e}")
+        print(f"DDG Error: {e}")
         return []
 
 def generate_speech(text, persona):
