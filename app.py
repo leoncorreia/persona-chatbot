@@ -478,6 +478,7 @@ import os
 import io
 import requests
 from bs4 import BeautifulSoup
+from duckduckgo_search import DDGS
 from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from google.generativeai import GenerativeModel, configure
@@ -648,7 +649,7 @@ except: pass
 
 # --- FUNCTIONS ---
 
-def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=1.6):
+def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_key, threshold=1.65):
     if index is None or index.ntotal == 0: return []
     query_vec = embedding_model.encode(query).reshape(1, -1)
     distances, indices = index.search(query_vec, 20)
@@ -662,18 +663,28 @@ def retrieve_similar_qa(query, index, lookup, embedding_model, selected_persona_
     return filtered
 
 def search_web(query):
+    """
+    Uses the duckduckgo_search library for robust, unblocked results.
+    """
+    print(f"🌐 Searching Web for: {query}") # Debug print
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        response = requests.get(f"https://html.duckduckgo.com/html/?q={query}", headers=headers, timeout=10)
-        if response.status_code != 200: return []
-        soup = BeautifulSoup(response.text, 'html.parser')
-        results = []
-        for r in soup.find_all('div', class_='result')[:3]:
-            t = r.find('a', class_='result__a')
-            s = r.find('a', class_='result__snippet')
-            if t and s: results.append({'title': t.get_text(strip=True), 'snippet': s.get_text(strip=True)})
-        return results
-    except: return []
+        # DDGS().text() returns a list of dictionaries: {'title':..., 'href':..., 'body':...}
+        results = DDGS().text(query, max_results=3)
+        
+        # Format it to match what our app expects
+        formatted_results = []
+        for r in results:
+            formatted_results.append({
+                'title': r['title'],
+                'snippet': r['body'] # DDGS uses 'body' for the snippet
+            })
+            
+        print(f"✅ Found {len(formatted_results)} results.")
+        return formatted_results
+        
+    except Exception as e:
+        print(f"❌ Search Error: {e}")
+        return []
 
 def generate_speech(text, persona):
     try:

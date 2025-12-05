@@ -7,3 +7,4 @@ openai
 google-generativeai
 elevenlabs
 groq
+duckduckgo_search
