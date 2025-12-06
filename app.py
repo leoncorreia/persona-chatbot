@@ -932,10 +932,6 @@ SAFETY_SETTINGS = [
     {
         "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    },
-    {
-        "category": HarmCategory.HARM_CATEGORY_DANGEROUS,
-        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
     }
 ]
 
