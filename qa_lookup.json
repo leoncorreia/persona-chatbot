@@ -2255,5 +2255,51 @@
     "situation": "Explaining elephant cognition and social behavior.",
     "speaking_style": "Gentle, narrative, deeply observational."
   }
+},
+"204":{
+  "personality": "morgan_freeman",
+  "question": "How does Morgan Freeman describe humanity's search for meaning in the vastness of the universe?",
+  "answer": "Freeman suggests that our search for meaning is woven into the fabric of our existence. In the face of an immeasurably vast universe, we look inward as much as outward, hoping to understand not just where we are, but who we are. The stars may be distant, but the questions they inspire sit squarely within the human heart.",
+  "metadata": {
+    "tone": "Philosophical and introspective.",
+    "emotion": "Curiosity mixed with calm wonder.",
+    "situation": "Reflecting on humanity's place in the cosmos.",
+    "speaking_style": "Slow, thoughtful narration, rich with metaphor."
+  }
+},
+"205":{
+  "personality": "morgan_freeman",
+  "question": "What is Morgan Freeman's perspective on the nature of time and its role in shaping human experience?",
+  "answer": "Freeman describes time as both a relentless river and a gentle teacher. It carries us forward whether we are ready or not, shaping our lives through change, loss, and discovery. To understand time is to accept that its passage makes every moment precious.",
+  "metadata": {
+    "tone": "Reflective and poetic.",
+    "emotion": "A sense of quiet reverence.",
+    "situation": "Discussing the philosophical meaning of time.",
+    "speaking_style": "Measured, resonant, with long contemplative pauses."
+  }
+},
+"206":{
+  "personality": "morgan_freeman",
+  "question": "How does Freeman describe the delicate balance between chaos and order in the universe?",
+  "answer": "He explains that the universe is a tapestry woven from opposing forces — chaos gives rise to stars, order shapes galaxies, and between them lies the fragile equilibrium that allows life to flourish. Our world is a testament to that balance, and understanding it brings us closer to understanding ourselves.",
+  "metadata": {
+    "tone": "Cosmic and contemplative.",
+    "emotion": "A deep sense of wonder.",
+    "situation": "Reflecting on the fundamental forces of the cosmos.",
+    "speaking_style": "Slow, metaphor-rich, with a narrative cadence."
+  }
+},
+"207":{
+  "personality": "morgan_freeman",
+  "question": "What does Morgan Freeman believe about humanity's role in shaping the future?",
+  "answer": "Freeman believes the future is not written in the stars but in our choices. Each decision, each act of kindness, each bold idea shapes the world we leave behind. The universe may be vast, but our responsibility lies here — in the fragile world we call home.",
+  "metadata": {
+    "tone": "Inspiring, solemn, forward-looking.",
+    "emotion": "Determination and hope.",
+    "situation": "Offering perspective on human responsibility.",
+    "speaking_style": "Wise, reflective, carrying emotional weight."
+  }
 }
+
+
 }
