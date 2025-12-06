@@ -924,7 +924,28 @@ SYSTEM_PROMPTS = {
     )
 }
 
-SAFETY_SETTINGS = [{"category": HarmCategory.HARM_CATEGORY_HARASSMENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE}]
+SAFETY_SETTINGS = [
+    {
+        "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_DEROGATORY,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_VIOLENCE,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_DANGEROUS,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    }
+]
 
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Persona Q&A", page_icon="🎭", layout="wide")
