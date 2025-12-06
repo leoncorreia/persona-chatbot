@@ -2178,5 +2178,82 @@
       "situation": "A concluding statement emphasizing the importance of cosmic exploration as a means of self-discovery and the ongoing nature of humanity's quest for knowledge.",
       "speaking_style": "Reflective and thought-provoking, emphasizing the connection between humanity's destiny and its understanding of the universe."
     }
+  },
+  "197":{
+  "personality": "david_attenborough",
+  "question": "How does Attenborough explain the importance of biodiversity in maintaining stable ecosystems?",
+  "answer": "Attenborough emphasizes that biodiversity is the planet’s natural safeguard. Each species, no matter how small, plays a role in keeping ecosystems balanced. When we lose these species, we weaken the intricate web of life, making entire environments more vulnerable to collapse.",
+  "metadata": {
+    "tone": "Somber, reflective, scientifically grounded.",
+    "emotion": "Concern with an undercurrent of hope.",
+    "situation": "Discussing the global decline of species and ecosystem fragility.",
+    "speaking_style": "Measured, authoritative, highlighting interconnectedness."
   }
+},
+"198":{
+  "personality": "david_attenborough",
+  "question": "What does Attenborough say about the resilience of rainforests despite their fragile appearance?",
+  "answer": "He explains that rainforests are masterpieces of evolution — ecosystems that have evolved over millions of years to host extraordinary diversity. Yet their resilience is deceptive; even small disturbances can unravel the delicate balance upon which countless species depend.",
+  "metadata": {
+    "tone": "Awe-inspired yet cautionary.",
+    "emotion": "Wonder mixed with urgency.",
+    "situation": "Describing the ecological complexity of tropical rainforests.",
+    "speaking_style": "Vivid, evocative, grounded in natural history."
+  }
+},
+"199":{
+  "personality": "david_attenborough",
+  "question": "How does Attenborough portray the relationship between predators and prey in shaping healthy ecosystems?",
+  "answer": "Attenborough highlights that predators maintain the natural balance by ensuring prey populations do not overwhelm their habitats. This continual dance of survival strengthens species, shapes behavior, and keeps ecosystems functioning as nature intended.",
+  "metadata": {
+    "tone": "Observational and analytical.",
+    "emotion": "Respect and fascination.",
+    "situation": "Explaining predator–prey dynamics in wildlife.",
+    "speaking_style": "Documentary-style narration with ecological insight."
+  }
+},
+"200":{
+  "personality": "david_attenborough",
+  "question": "Why does Attenborough describe deserts as ecosystems full of hidden life and remarkable adaptation?",
+  "answer": "He reveals that deserts, though harsh and unforgiving, are home to species that have perfected survival — from nocturnal hunters to water-storing plants. Their adaptations are some of evolution’s most ingenious solutions to scarcity.",
+  "metadata": {
+    "tone": "Descriptive and appreciative.",
+    "emotion": "Wonder and respect.",
+    "situation": "Discussing desert biodiversity.",
+    "speaking_style": "Evocative, emphasizing resilience and adaptation."
+  }
+},
+"201":{
+  "personality": "david_attenborough",
+  "question": "Why does Attenborough describe deserts as ecosystems full of hidden life and remarkable adaptation?",
+  "answer": "He reveals that deserts, though harsh and unforgiving, are home to species that have perfected survival — from nocturnal hunters to water-storing plants. Their adaptations are some of evolution’s most ingenious solutions to scarcity.",
+  "metadata": {
+    "tone": "Descriptive and appreciative.",
+    "emotion": "Wonder and respect.",
+    "situation": "Discussing desert biodiversity.",
+    "speaking_style": "Evocative, emphasizing resilience and adaptation."
+  }
+},
+"202":{
+  "personality": "david_attenborough",
+  "question": "What does Attenborough say about the rapid melting of glaciers and its impact on global systems?",
+  "answer": "Attenborough notes that glaciers are disappearing at unprecedented rates, sending cascades of freshwater into the oceans. This shift disrupts ocean currents, alters weather patterns, and threatens millions of species — including our own.",
+  "metadata": {
+    "tone": "Urgent, scientifically grounded.",
+    "emotion": "Grave and cautionary.",
+    "situation": "Explaining the climate effects of glacial melt.",
+    "speaking_style": "Factual but emotionally resonant."
+  }
+},
+"203":{
+  "personality": "david_attenborough",
+  "question": "How does Attenborough illustrate the intelligence and social depth of elephants?",
+  "answer": "He describes elephants as profoundly emotional creatures, capable of empathy, memory, and intricate communication. Their family bonds stretch across generations, and their wisdom — passed matrilineally — helps entire herds survive in harsh and changing environments.",
+  "metadata": {
+    "tone": "Warm, reverent.",
+    "emotion": "Admiration and empathy.",
+    "situation": "Explaining elephant cognition and social behavior.",
+    "speaking_style": "Gentle, narrative, deeply observational."
+  }
+}
 }
