@@ -934,10 +934,6 @@ SAFETY_SETTINGS = [
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
     },
     {
-        "category": HarmCategory.HARM_CATEGORY_DEROGATORY,
-        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    },
-    {
         "category": HarmCategory.HARM_CATEGORY_VIOLENCE,
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
     },
