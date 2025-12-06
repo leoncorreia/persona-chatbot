@@ -934,18 +934,19 @@ SAFETY_SETTINGS = [
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
     },
     {
-        "category": HarmCategory.HARM_CATEGORY_SEXUAL_CONTENT,
+        "category": HarmCategory.HARM_CATEGORY_DEROGATORY,
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
     },
     {
-        "category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        "category": HarmCategory.HARM_CATEGORY_VIOLENCE,
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
     },
     {
-        "category": HarmCategory.HARM_CATEGORY_SELF_HARM,
+        "category": HarmCategory.HARM_CATEGORY_DANGEROUS,
         "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    },
+    }
 ]
+
 
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Persona Q&A", page_icon="🎭", layout="wide")
