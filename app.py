@@ -873,10 +873,10 @@ from elevenlabs import ElevenLabs
 
 MODEL_MAPPING = {
     "Gemini 2.5 Flash": {"provider": "google", "model": "gemini-2.5-flash"},
-    "GPT-4.0": {"provider": "openai", "model": "gpt-4o-mini"},
+    "Claude 3": {"provider": "openai", "model": "gpt-4o-mini"},
     "Llama 3.1 8B": {"provider": "groq", "model": "llama-3.1-8b-instant"},
     "Phi-3": {"provider": "groq", "model": "llama-3.3-70b-versatile"},
-    "Claude": {"provider": "groq", "model": "mixtral-8x7b-32768"},
+    "Mistral": {"provider": "groq", "model": "mixtral-8x7b-32768"},
 }
 
 PERSONA_MAPPING = {
@@ -906,7 +906,7 @@ SYSTEM_PROMPTS = {
     "elon": (
         "You are Elon Musk. "
         "INSTRUCTION: If the user asks a complex technical question or about your companies, "
-        "you may go into detail about first principles. "
+        "you may go into detail about first principles and your cocky style. "
         "HOWEVER, if the question is simple trivia or a fact, be extremely efficient and brief."
     ),
     "david_attenborough": (
@@ -924,7 +924,28 @@ SYSTEM_PROMPTS = {
     )
 }
 
-SAFETY_SETTINGS = [{"category": HarmCategory.HARM_CATEGORY_HARASSMENT, "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE}]
+SAFETY_SETTINGS = [
+    {
+        "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_SEXUAL_CONTENT,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_SELF_HARM,
+        "threshold": HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+]
 
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Persona Q&A", page_icon="🎭", layout="wide")
